@@ -14,11 +14,15 @@ import {
   Stack,
   Textarea,
 } from "@chakra-ui/react";
+import { useState } from "react";
 
 import { useIdeas } from "../../contexts/IdeasContext";
 
 export function NewIdeaDrawer() {
-  const { sendIdeaDrawerDisclosure } = useIdeas();
+  const { sendIdeaDrawerDisclosure, handleSendIdea } = useIdeas();
+
+  const [titleContent, setTitleContent] = useState("");
+  const [descriptionContent, setDescriptionContent] = useState("");
 
   return (
     <Drawer
@@ -59,6 +63,8 @@ export function NewIdeaDrawer() {
 
               <Input
                 id="ideatitle"
+                value={titleContent}
+                onChange={(event) => setTitleContent(event.target.value)}
                 placeholder="Your idea title"
                 px="6"
                 py="6"
@@ -84,6 +90,8 @@ export function NewIdeaDrawer() {
 
               <Textarea
                 id="desc"
+                value={descriptionContent}
+                onChange={(event) => setDescriptionContent(event.target.value)}
                 placeholder="Describe your amazing idea"
                 px="6"
                 py="6"
