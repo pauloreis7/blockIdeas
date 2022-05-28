@@ -30,6 +30,7 @@ export function ConnectWalletModal() {
         onClose={() => setWalletModalOpen(false)}
         isOpen={isWalletModalOpen}
         motionPreset="slideInBottom"
+        isCentered
       >
         <ModalOverlay zIndex={10} />
 

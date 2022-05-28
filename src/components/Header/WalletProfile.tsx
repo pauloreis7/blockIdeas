@@ -10,15 +10,18 @@ const connectorImagesPath = {
 type WalletProfileProps = {
   walletFormatted: string | null;
   connectorName: ConnectorsName;
+  handleOpenWalletProfileModal: (isOpen: boolean) => void;
 };
 
 export function WalletProfile({
   walletFormatted,
   connectorName,
+  handleOpenWalletProfileModal,
 }: WalletProfileProps) {
   return (
     <Flex
       as="button"
+      onClick={() => handleOpenWalletProfileModal(true)}
       px="3"
       py="2"
       alignItems="center"

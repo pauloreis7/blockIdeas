@@ -10,7 +10,12 @@ import { ConnectWallet } from "./ConnectWallet";
 export function Header() {
   const { account } = useWeb3React();
 
-  const { walletFormatted, connectorName, setWalletModalOpen } = useWallet();
+  const {
+    walletFormatted,
+    connectorName,
+    setWalletModalOpen,
+    setIsWalletProfileModalOpen,
+  } = useWallet();
 
   return (
     <Flex
@@ -27,6 +32,7 @@ export function Header() {
         <WalletProfile
           walletFormatted={walletFormatted}
           connectorName={connectorName}
+          handleOpenWalletProfileModal={setIsWalletProfileModalOpen}
         />
       ) : (
         <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />

@@ -3,6 +3,7 @@ import Head from "next/head";
 
 import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
+import { WalletProfileModal } from "../components/WalletProfileModal";
 
 export default function Home() {
   return (
@@ -15,6 +16,8 @@ export default function Home() {
       <Header />
 
       <ConnectWalletModal />
+
+      <WalletProfileModal />
 
       <main>
         <h1>Ideas Chain</h1>
