@@ -12,12 +12,25 @@ import {
   Heading,
 } from "@chakra-ui/react";
 
+import { useWallet } from "../../contexts/WalletContext";
+
 import { ConnectWalletButton } from "./ConnectWalletButton";
 
 export function ConnectWalletModal() {
+  const {
+    isWalletModalOpen,
+    setWalletModalOpen,
+    handleMetaMask,
+    handleWalletConnect,
+  } = useWallet();
+
   return (
-    <ScaleFade initialScale={2} in={true}>
-      <Modal onClose={() => {}} isOpen={true} motionPreset="slideInBottom">
+    <ScaleFade initialScale={2} in={isWalletModalOpen}>
+      <Modal
+        onClose={() => setWalletModalOpen(false)}
+        isOpen={isWalletModalOpen}
+        motionPreset="slideInBottom"
+      >
         <ModalOverlay zIndex={10} />
 
         <ModalContent bg="gray.800" borderRadius="0.5rem">
@@ -32,11 +45,13 @@ export function ConnectWalletModal() {
               <ConnectWalletButton
                 title="MetaMask"
                 imageUrl="/metamask-logo.svg"
+                handleConnectWallet={handleMetaMask}
               />
 
               <ConnectWalletButton
                 title="WalletConnect"
                 imageUrl="/walletconnect-logo.svg"
+                handleConnectWallet={handleWalletConnect}
               />
             </Stack>
           </ModalBody>

@@ -3,15 +3,18 @@ import { Text, Flex, Image } from "@chakra-ui/react";
 type ConnectWalletButtonProps = {
   imageUrl: string;
   title: string;
+  handleConnectWallet: () => Promise<void>;
 };
 
 export function ConnectWalletButton({
   imageUrl,
   title,
+  handleConnectWallet,
 }: ConnectWalletButtonProps) {
   return (
     <Flex
       as="button"
+      onClick={handleConnectWallet}
       direction="column"
       alignItems="center"
       p="6"

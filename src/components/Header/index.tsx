@@ -1,8 +1,17 @@
-import { Flex, Text, Image } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+import { useWeb3React } from "@web3-react/core";
+
+import { useWallet } from "../../contexts/WalletContext";
 
 import { Logo } from "./Logo";
+import { WalletProfile } from "./WalletProfile";
+import { ConnectWallet } from "./ConnectWallet";
 
 export function Header() {
+  const { account } = useWeb3React();
+
+  const { walletFormatted, connectorName, setWalletModalOpen } = useWallet();
+
   return (
     <Flex
       as="header"
@@ -14,37 +23,14 @@ export function Header() {
     >
       <Logo />
 
-      <Flex
-        as="button"
-        px="3"
-        py="2"
-        alignItems="center"
-        backgroundColor="gray.700"
-        borderRadius="full"
-        transition="200ms"
-        _hover={{
-          backgroundColor: "gray.600",
-        }}
-      >
-        <Text
-          fontSize={["lg", "xl"]}
-          fontWeight="600"
-          pr="2"
-          borderRight="1px"
-          borderColor="gray.900"
-        >
-          0x70...3d71
-        </Text>
-
-        <Image
-          src="/metamask-logo.svg"
-          alt="Metamask logo"
-          ml="2"
-          p="0.05rem"
-          boxSize="1.75rem"
-          objectFit="cover"
+      {account && connectorName ? (
+        <WalletProfile
+          walletFormatted={walletFormatted}
+          connectorName={connectorName}
         />
-      </Flex>
+      ) : (
+        <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
+      )}
     </Flex>
   );
 }
