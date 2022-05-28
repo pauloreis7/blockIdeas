@@ -12,6 +12,8 @@ type IdeasContextData = {
   sendIdeaDrawerDisclosure: UseDisclosureReturn;
 };
 
+export type VotesTypes = "upvote" | "downvote";
+
 const IdeasContext = createContext({} as IdeasContextData);
 
 export function IdeasProvider({ children }: IdeasProviderProps) {

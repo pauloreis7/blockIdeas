@@ -77,6 +77,8 @@ export default function Home() {
               title={idea.title}
               description={idea.description}
               created_at={idea.created_at}
+              upvotes={idea.upvotes}
+              downvotes={idea.downvotes}
             />
           ))}
         </SimpleGrid>
@@ -91,29 +93,29 @@ const tempIdeas = [
     description:
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit Temporibus nostrum doloribus porro ab debitis quam nemo. Id  itaque tota...",
     created_at: "17:05 - 28/05/2022",
+    votesCount: 14,
+    isVoted: true,
+    upvotes: {
+      votesCount: 14,
+      isVoted: true,
+    },
+    downvotes: {
+      votesCount: 4,
+      isVoted: false,
+    },
   },
   {
     title: "My custom title",
     description:
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit Temporibus nostrum doloribus porro ab debitis quam nemo. Id  itaque tota...",
     created_at: "17:05 - 28/05/2022",
-  },
-  {
-    title: "My custom title",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit Temporibus nostrum doloribus porro ab debitis quam nemo. Id  itaque tota...",
-    created_at: "17:05 - 28/05/2022",
-  },
-  {
-    title: "My custom title",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit Temporibus nostrum doloribus porro ab debitis quam nemo. Id  itaque tota...",
-    created_at: "17:05 - 28/05/2022",
-  },
-  {
-    title: "My custom title",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit Temporibus nostrum doloribus porro ab debitis quam nemo. Id  itaque tota...",
-    created_at: "17:05 - 28/05/2022",
+    upvotes: {
+      votesCount: 3,
+      isVoted: false,
+    },
+    downvotes: {
+      votesCount: 12,
+      isVoted: true,
+    },
   },
 ];

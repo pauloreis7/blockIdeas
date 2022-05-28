@@ -1,13 +1,29 @@
-import { Button, Flex, Box, Text } from "@chakra-ui/react";
-import { FiSearch } from "react-icons/fi";
+import { Box, Text, Flex } from "@chakra-ui/react";
+
+import { IdeaContent } from "./IdeaContent";
+import { VoteItem } from "./VoteItem";
 
 type IdeaProps = {
   title: string;
   description: string;
   created_at: string;
+  upvotes: {
+    votesCount: number;
+    isVoted: boolean;
+  };
+  downvotes: {
+    votesCount: number;
+    isVoted: boolean;
+  };
 };
 
-export function Idea({ title, description, created_at }: IdeaProps) {
+export function Idea({
+  title,
+  description,
+  created_at,
+  upvotes,
+  downvotes,
+}: IdeaProps) {
   return (
     <Box
       w="100%"
@@ -17,12 +33,6 @@ export function Idea({ title, description, created_at }: IdeaProps) {
       border="2px"
       borderRadius="0.25rem"
       borderColor="gray.600"
-      cursor="pointer"
-      transition="200ms"
-      _hover={{
-        filter: "brightness(0.8)",
-        button: { bottom: "1rem", visibility: "visible", opacity: "1" },
-      }}
     >
       <Flex
         w="100%"
@@ -35,31 +45,23 @@ export function Idea({ title, description, created_at }: IdeaProps) {
         <Text color="gray.400" fontWeight="600">
           {title}
         </Text>
+
+        <Flex alignItems="center">
+          <VoteItem
+            voteType="upvote"
+            isVoted={upvotes.isVoted}
+            votesCount={upvotes.votesCount}
+          />
+
+          <VoteItem
+            voteType="downvote"
+            isVoted={downvotes.isVoted}
+            votesCount={downvotes.votesCount}
+          />
+        </Flex>
       </Flex>
 
-      <Box px="4" py="4">
-        <Text mb="6" py="4" color="gray.400">
-          {description}
-        </Text>
-
-        <Text w="100%" textAlign="right" color="gray.600">
-          {created_at}
-        </Text>
-      </Box>
-
-      <Button
-        position="absolute"
-        bottom="0"
-        left="35%"
-        leftIcon={<FiSearch fontSize="1.5rem" />}
-        borderRadius="full"
-        colorScheme="yellow"
-        transition="200ms"
-        visibility="hidden"
-        opacity="0"
-      >
-        Read
-      </Button>
+      <IdeaContent description={description} created_at={created_at} />
     </Box>
   );
 }
