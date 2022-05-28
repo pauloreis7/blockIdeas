@@ -1,12 +1,17 @@
 import { Button, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
 import Head from "next/head";
 
+import { useIdeas } from "../contexts/IdeasContext";
+
 import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
 import { WalletProfileModal } from "../components/WalletProfileModal";
+import { NewIdeaDrawer } from "../components/NewIdeaDrawer";
 import { Idea } from "../components/Idea";
 
 export default function Home() {
+  const { sendIdeaDrawerDisclosure } = useIdeas();
+
   return (
     <Flex
       w="100%"
@@ -26,6 +31,8 @@ export default function Home() {
       <ConnectWalletModal />
 
       <WalletProfileModal />
+
+      <NewIdeaDrawer />
 
       <Flex
         as="main"
@@ -48,7 +55,12 @@ export default function Home() {
             Ideas list
           </Heading>
 
-          <Button colorScheme="yellow">Send idea</Button>
+          <Button
+            onClick={sendIdeaDrawerDisclosure.onOpen}
+            colorScheme="yellow"
+          >
+            Send idea
+          </Button>
         </Flex>
 
         <SimpleGrid
