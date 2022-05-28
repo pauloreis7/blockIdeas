@@ -4,12 +4,12 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Block ideas</title>
+        <title>Ideas Chain</title>
         <meta name="description" content="Share and vote to blockchain ideas" />
       </Head>
 
       <main>
-        <h1>Hello World!</h1>
+        <h1>Ideas Chain</h1>
       </main>
     </div>
   );
