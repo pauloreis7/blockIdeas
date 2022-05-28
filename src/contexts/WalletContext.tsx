@@ -69,7 +69,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
 
   useEffect(() => {
     const walletFormatted = account
-      ? `${account.substring(0, 6)}...${account.substring(account.length - 3)}`
+      ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
       : null;
 
     setWalletFormatted(walletFormatted);
