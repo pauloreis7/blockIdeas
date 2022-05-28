@@ -40,8 +40,6 @@ export function NewIdeaDrawer() {
         await contract.functions.createIdea('some title', 'some desc')
       ).wait()
 
-      console.log({ tx })
-
       setTitle('')
       setDescription('')
     } catch (err) {

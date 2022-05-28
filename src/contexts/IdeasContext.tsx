@@ -3,9 +3,10 @@ import React, {
   PropsWithChildren,
   useContext,
   useState,
-} from "react";
-import { useDisclosure, UseDisclosureReturn } from "@chakra-ui/hooks";
-import { useWeb3React } from "@web3-react/core";
+} from 'react'
+import { useEffect } from 'react'
+import { useDisclosure, UseDisclosureReturn } from '@chakra-ui/hooks'
+import { useWeb3React } from '@web3-react/core'
 
 // web3
 import { config } from '../config'
@@ -13,17 +14,30 @@ import { config } from '../config'
 type IdeasProviderProps = PropsWithChildren<{}>
 
 type IdeasContextData = {
-  sendIdeaDrawerDisclosure: UseDisclosureReturn;
-  isIdeasListLoading: boolean;
-  setIsIdeasListLoading: (isLoading: boolean) => void;
-  handleSendIdea: () => Promise<string | void>;
-};
+  ideas: Ideas[]
+  sendIdeaDrawerDisclosure: UseDisclosureReturn
+  isIdeasListLoading: boolean
+  setIsIdeasListLoading: (isLoading: boolean) => void
+  handleSendIdea: () => Promise<string | void>
+}
 
 export type VotesTypes = 'upvote' | 'downvote'
+export type Ideas = {
+  id: number
+  title: string
+  upvotes: number
+  createdBy: string
+  downvotes: number
+  description: string
+  createdAt: string | Date
+}
 
 const IdeasContext = createContext({} as IdeasContextData)
 
 export function IdeasProvider({ children }: IdeasProviderProps) {
+  // states
+  const [ideas, setIdeas] = useState<Ideas[]>([])
+
   // hooks
   const disclosure = useDisclosure()
 
@@ -45,9 +59,26 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
           description,
           title,
         } = await contract.functions.ideas(i)
+        const formattedId = Number(id.toString())
+        const formattedUpvotes = Number(upvotes.toString())
+        const formattedDownvotes = Number(downvotes.toString())
+        const formattedCreatedAt = new Date(
+          Number(createdAt.toString())
+        ).toDateString()
+
+        const formattedIdea = {
+          title,
+          createdBy,
+          description,
+          id: formattedId,
+          upvotes: formattedUpvotes,
+          downvotes: formattedDownvotes,
+          createdAt: formattedCreatedAt,
+        }
+        ideas.push(formattedIdea)
       }
 
-      console.log(ideas)
+      setIdeas(ideas)
     } catch (err) {
       const error = err as Error
 
@@ -59,29 +90,30 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
   useEffect(() => {
     ;(async () => await fetchIdeas())()
   }, [])
-  const { account, activate, deactivate, connector } = useWeb3React();
+  const { account, activate, deactivate, connector } = useWeb3React()
 
-  const [isIdeasListLoading, setIsIdeasListLoading] = useState(false);
+  const [isIdeasListLoading, setIsIdeasListLoading] = useState(false)
 
   async function handleSendIdea() {
     try {
       if (!account) {
-        throw new Error("Wallet not connected");
+        throw new Error('Wallet not connected')
       }
 
-      return;
+      return
     } catch (err) {
-      console.log(err);
+      console.log(err)
 
-      const errorMessage = (err as Error).message;
+      const errorMessage = (err as Error).message
 
-      return errorMessage;
+      return errorMessage
     }
   }
 
   return (
     <IdeasContext.Provider
       value={{
+        ideas,
         sendIdeaDrawerDisclosure: disclosure,
         isIdeasListLoading,
         setIsIdeasListLoading,
