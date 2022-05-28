@@ -2,6 +2,7 @@ import { Flex } from "@chakra-ui/react";
 import Head from "next/head";
 
 import { Header } from "../components/Header";
+import { ConnectWalletModal } from "../components/ConnectWalletModal";
 
 export default function Home() {
   return (
@@ -12,6 +13,8 @@ export default function Home() {
       </Head>
 
       <Header />
+
+      <ConnectWalletModal />
 
       <main>
         <h1>Ideas Chain</h1>
