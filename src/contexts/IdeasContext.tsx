@@ -3,9 +3,9 @@ import React, {
   PropsWithChildren,
   useContext,
   useState,
-  useEffect,
-} from 'react'
-import { useDisclosure, UseDisclosureReturn } from '@chakra-ui/hooks'
+} from "react";
+import { useDisclosure, UseDisclosureReturn } from "@chakra-ui/hooks";
+import { useWeb3React } from "@web3-react/core";
 
 // web3
 import { config } from '../config'
@@ -13,8 +13,11 @@ import { config } from '../config'
 type IdeasProviderProps = PropsWithChildren<{}>
 
 type IdeasContextData = {
-  sendIdeaDrawerDisclosure: UseDisclosureReturn
-}
+  sendIdeaDrawerDisclosure: UseDisclosureReturn;
+  isIdeasListLoading: boolean;
+  setIsIdeasListLoading: (isLoading: boolean) => void;
+  handleSendIdea: () => Promise<string | void>;
+};
 
 export type VotesTypes = 'upvote' | 'downvote'
 
@@ -56,11 +59,33 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
   useEffect(() => {
     ;(async () => await fetchIdeas())()
   }, [])
+  const { account, activate, deactivate, connector } = useWeb3React();
+
+  const [isIdeasListLoading, setIsIdeasListLoading] = useState(false);
+
+  async function handleSendIdea() {
+    try {
+      if (!account) {
+        throw new Error("Wallet not connected");
+      }
+
+      return;
+    } catch (err) {
+      console.log(err);
+
+      const errorMessage = (err as Error).message;
+
+      return errorMessage;
+    }
+  }
 
   return (
     <IdeasContext.Provider
       value={{
         sendIdeaDrawerDisclosure: disclosure,
+        isIdeasListLoading,
+        setIsIdeasListLoading,
+        handleSendIdea,
       }}
     >
       {children}

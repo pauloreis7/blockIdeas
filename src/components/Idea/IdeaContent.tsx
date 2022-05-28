@@ -19,7 +19,7 @@ export function IdeaContent({ description, created_at }: IdeaProps) {
       }}
     >
       <Text mb="6" py="4" color="gray.400">
-        {description}
+        {description.substring(0, 133)}...
       </Text>
 
       <Text w="100%" textAlign="right" color="gray.600">

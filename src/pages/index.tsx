@@ -1,4 +1,12 @@
-import { Button, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
+import {
+  Button,
+  Text,
+  Flex,
+  Heading,
+  SimpleGrid,
+  Spinner,
+  SkeletonText,
+} from "@chakra-ui/react";
 import Head from "next/head";
 
 import { useIdeas } from "../contexts/IdeasContext";
@@ -10,7 +18,7 @@ import { NewIdeaDrawer } from "../components/NewIdeaDrawer";
 import { Idea } from "../components/Idea";
 
 export default function Home() {
-  const { sendIdeaDrawerDisclosure } = useIdeas();
+  const { sendIdeaDrawerDisclosure, isIdeasListLoading } = useIdeas();
 
   return (
     <Flex
@@ -51,9 +59,25 @@ export default function Home() {
           justifyContent="space-between"
           mb="8"
         >
-          <Heading fontSize="2xl" color="gray.300" fontWeight="400">
-            Ideas list
-          </Heading>
+          <Flex w="100%" alignItems="center" textAlign="left">
+            <Heading
+              mr="5"
+              fontSize="2xl"
+              color="gray.300"
+              fontWeight="400"
+              textTransform="capitalize"
+            >
+              ideas list
+            </Heading>
+
+            {isIdeasListLoading && (
+              <>
+                <Spinner size="sm" color="gray.500" mr="2" />
+
+                <Text color="gray.500">Fetching</Text>
+              </>
+            )}
+          </Flex>
 
           <Button
             onClick={sendIdeaDrawerDisclosure.onOpen}
@@ -63,25 +87,35 @@ export default function Home() {
           </Button>
         </Flex>
 
-        <SimpleGrid
+        <SkeletonText
+          isLoaded={!isIdeasListLoading}
           w="100%"
-          h="100%"
-          gap="4"
-          minChildWidth="22rem"
-          alignItems="center"
-          justifyContent="center"
+          borderRadius="xl"
+          startColor="gray.700"
+          endColor="gray.600"
+          spacing="6"
+          noOfLines={8}
         >
-          {tempIdeas.map((idea, i) => (
-            <Idea
-              key={i}
-              title={idea.title}
-              description={idea.description}
-              created_at={idea.created_at}
-              upvotes={idea.upvotes}
-              downvotes={idea.downvotes}
-            />
-          ))}
-        </SimpleGrid>
+          <SimpleGrid
+            w="100%"
+            h="100%"
+            gap="4"
+            minChildWidth="22rem"
+            alignItems="center"
+            justifyContent="center"
+          >
+            {tempIdeas.map((idea, i) => (
+              <Idea
+                key={i}
+                title={idea.title}
+                description={idea.description}
+                created_at={idea.created_at}
+                upvotes={idea.upvotes}
+                downvotes={idea.downvotes}
+              />
+            ))}
+          </SimpleGrid>
+        </SkeletonText>
       </Flex>
     </Flex>
   );
@@ -91,7 +125,7 @@ const tempIdeas = [
   {
     title: "My custom title",
     description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit Temporibus nostrum doloribus porro ab debitis quam nemo. Id  itaque tota...",
+      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum obcaecati rem numquam tenetur blanditiis eum nam, atque pariatur veniam sit minus porro minima autem voluptatem praesentium laborum vero quibusdam deleniti?",
     created_at: "17:05 - 28/05/2022",
     votesCount: 14,
     isVoted: true,
@@ -107,7 +141,7 @@ const tempIdeas = [
   {
     title: "My custom title",
     description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit Temporibus nostrum doloribus porro ab debitis quam nemo. Id  itaque tota...",
+      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum obcaecati rem numquam tenetur blanditiis eum nam, atque pariatur veniam sit minus porro minima autem voluptatem praesentium laborum vero quibusdam deleniti?",
     created_at: "17:05 - 28/05/2022",
     upvotes: {
       votesCount: 3,
