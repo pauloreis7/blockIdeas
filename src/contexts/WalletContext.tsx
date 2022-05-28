@@ -6,9 +6,9 @@ import React, {
   useState,
 } from "react";
 import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
+import { useToast } from "@chakra-ui/react";
 
 import { ConnectorsName, connectorTypes } from "../config/walletConnetors";
 // import { getWalletError } from "../functions/wallet/getWalletError";
@@ -37,8 +37,9 @@ type WalletContextData = {
 const WalletContext = createContext({} as WalletContextData);
 
 export function WalletProvider({ children }: WalletProviderProps) {
-  const { chainId, account, activate, deactivate, connector } =
-    useWeb3React<Web3Provider>();
+  const { account, activate, deactivate, connector } = useWeb3React();
+
+  const toast = useToast();
 
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
   const [isWalletProfileModalOpen, setIsWalletProfileModalOpen] =
@@ -63,9 +64,9 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }
   }, [activate]);
 
-  useEffect(() => {
-    // getInactiveListener({ activate, chainId });
-  }, [activate, chainId]);
+  // useEffect(() => {
+  //   getInactiveListener({ activate, chainId });
+  // }, [activate, chainId]);
 
   useEffect(() => {
     const walletFormatted = account
@@ -104,7 +105,14 @@ export function WalletProvider({ children }: WalletProviderProps) {
 
       const toastErrorMessage = (err as Error).message;
 
-      // addToast(toastErrorMessage, "error");
+      toast({
+        title: toastErrorMessage,
+        description: "Please try again",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top-right",
+      });
 
       // const errorMessage = getWalletError(err as Error);
 
@@ -129,7 +137,14 @@ export function WalletProvider({ children }: WalletProviderProps) {
         walletConnect.walletConnectProvider = undefined;
       }
 
-      // addToast(err.message, "error");
+      toast({
+        title: err.message,
+        description: "Please try again",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top-right",
+      });
     });
 
     localStorage.setItem("@pwarz.last-wallet-connector", "walletConnect");

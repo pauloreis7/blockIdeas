@@ -4,34 +4,59 @@ import React, {
   useContext,
   useState,
   useEffect,
-} from 'react'
-import { useDisclosure, UseDisclosureReturn } from '@chakra-ui/hooks'
+} from "react";
+import { useDisclosure, UseDisclosureReturn } from "@chakra-ui/hooks";
 
 // web3
-import { config } from '../config'
+import { config } from "../config";
 
-type IdeasProviderProps = PropsWithChildren<{}>
+type IdeasProviderProps = PropsWithChildren<{}>;
+
+type IdeaProps = {
+  title: string;
+  description: string;
+  created_at: number;
+  upvotes: {
+    votesCount: number;
+    isVoted: boolean;
+  };
+  downvotes: {
+    votesCount: number;
+    isVoted: boolean;
+  };
+}[];
 
 type IdeasContextData = {
-  sendIdeaDrawerDisclosure: UseDisclosureReturn
-}
+  sendIdeaDrawerDisclosure: UseDisclosureReturn;
+  isIdeasListLoading: boolean;
+  setIsIdeasListLoading: (isLoading: boolean) => void;
+};
 
-export type VotesTypes = 'upvote' | 'downvote'
+export type VotesTypes = "upvote" | "downvote";
 
-const IdeasContext = createContext({} as IdeasContextData)
+const IdeasContext = createContext({} as IdeasContextData);
 
 export function IdeasProvider({ children }: IdeasProviderProps) {
+  const disclosure = useDisclosure();
+
+  // fetches all ideas on page load
+  useEffect(() => {
+    (async () => await fetchIdeas())();
+  }, []);
+  const [isIdeasListLoading, setIsIdeasListLoading] = useState(false);
+
   // hooks
-  const disclosure = useDisclosure()
 
   async function fetchIdeas() {
+    setIsIdeasListLoading(true);
+
     try {
-      const contract = config.contracts.BoardIdeas()
+      const contract = config.contracts.BoardIdeas();
 
-      const [totalIdeas] = await contract.functions.totalIdeas()
-      const formattedTotalIdeas = Number(totalIdeas.toString())
+      const [totalIdeas] = await contract.functions.totalIdeas();
+      const formattedTotalIdeas = Number(totalIdeas.toString());
 
-      const ideas = []
+      const ideas: IdeaProps = [];
       for (let i = 0; i < formattedTotalIdeas; i++) {
         const {
           createdAt,
@@ -41,31 +66,30 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
           id,
           description,
           title,
-        } = await contract.functions.ideas(i)
+        } = await contract.functions.ideas(i);
       }
 
-      console.log(ideas)
+      console.log(ideas);
     } catch (err) {
-      const error = err as Error
+      const error = err as Error;
 
-      console.log({ error })
+      console.log({ error });
+    } finally {
+      setIsIdeasListLoading(false);
     }
   }
-
-  // fetches all ideas on page load
-  useEffect(() => {
-    ;(async () => await fetchIdeas())()
-  }, [])
 
   return (
     <IdeasContext.Provider
       value={{
         sendIdeaDrawerDisclosure: disclosure,
+        isIdeasListLoading,
+        setIsIdeasListLoading,
       }}
     >
       {children}
     </IdeasContext.Provider>
-  )
+  );
 }
 
-export const useIdeas = () => useContext(IdeasContext)
+export const useIdeas = () => useContext(IdeasContext);
