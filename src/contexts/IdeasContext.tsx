@@ -4,16 +4,35 @@ import React, {
   useContext,
   useState,
 } from "react";
+import { useEffect } from "react";
 import { useDisclosure, UseDisclosureReturn } from "@chakra-ui/hooks";
 import { useWeb3React } from "@web3-react/core";
 
+// web3
+import { config } from "../config";
+
 type IdeasProviderProps = PropsWithChildren<{}>;
 
+type IdeaProps = {
+  title: string;
+  description: string;
+  createdBy: string;
+  createdAt: string | Date;
+  upvotes: {
+    votesCount: number;
+    isVoted: boolean;
+  };
+  downvotes: {
+    votesCount: number;
+    isVoted: boolean;
+  };
+};
+
 type IdeasContextData = {
+  ideas: IdeaProps[];
   sendIdeaDrawerDisclosure: UseDisclosureReturn;
   isIdeasListLoading: boolean;
   setIsIdeasListLoading: (isLoading: boolean) => void;
-  handleSendIdea: () => Promise<string | void>;
 };
 
 export type VotesTypes = "upvote" | "downvote";
@@ -21,9 +40,66 @@ export type VotesTypes = "upvote" | "downvote";
 const IdeasContext = createContext({} as IdeasContextData);
 
 export function IdeasProvider({ children }: IdeasProviderProps) {
+  // states
+  const [ideas, setIdeas] = useState<IdeaProps[]>([]);
+
+  // hooks
+  const disclosure = useDisclosure();
   const { account, activate, deactivate, connector } = useWeb3React();
 
-  const disclosure = useDisclosure();
+  async function fetchIdeas() {
+    setIsIdeasListLoading(true);
+
+    try {
+      const contract = config.contracts.BoardIdeas();
+
+      const [totalIdeas] = await contract.functions.totalIdeas();
+      const formattedTotalIdeas = Number(totalIdeas.toString());
+
+      const ideas: IdeaProps[] = [];
+      for (let i = 0; i < formattedTotalIdeas; i++) {
+        const {
+          createdAt,
+          createdBy,
+          downvotes,
+          upvotes,
+          id,
+          description,
+          title,
+        } = await contract.functions.ideas(i);
+        const formattedId = Number(id.toString());
+        const formattedUpvotes = Number(upvotes.toString());
+        const formattedDownvotes = Number(downvotes.toString());
+        const formattedCreatedAt = new Date(
+          Number(createdAt.toString())
+        ).toDateString();
+
+        const formattedIdea = {
+          title,
+          createdBy,
+          description,
+          id: formattedId,
+          upvotes: { votesCount: formattedUpvotes, isVoted: false },
+          downvotes: { votesCount: formattedDownvotes, isVoted: false },
+          createdAt: formattedCreatedAt,
+        };
+        ideas.push(formattedIdea);
+      }
+
+      setIdeas(ideas);
+    } catch (err) {
+      const error = err as Error;
+
+      console.log({ error });
+    } finally {
+      setIsIdeasListLoading(false);
+    }
+  }
+
+  // fetches all ideas on page load
+  useEffect(() => {
+    (async () => await fetchIdeas())();
+  }, []);
 
   const [isIdeasListLoading, setIsIdeasListLoading] = useState(false);
 
@@ -46,10 +122,10 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
   return (
     <IdeasContext.Provider
       value={{
+        ideas,
         sendIdeaDrawerDisclosure: disclosure,
         isIdeasListLoading,
         setIsIdeasListLoading,
-        handleSendIdea,
       }}
     >
       {children}

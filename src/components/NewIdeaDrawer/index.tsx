@@ -15,14 +15,45 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useWeb3React } from "@web3-react/core";
 
+// hooks
+import { useSigner } from "../../hooks/useSigner";
 import { useIdeas } from "../../contexts/IdeasContext";
 
-export function NewIdeaDrawer() {
-  const { sendIdeaDrawerDisclosure, handleSendIdea } = useIdeas();
+// web3
+import { config } from "../../config";
 
-  const [titleContent, setTitleContent] = useState("");
-  const [descriptionContent, setDescriptionContent] = useState("");
+export function NewIdeaDrawer() {
+  // states
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  // hooks
+  const { signer } = useSigner();
+  const { account } = useWeb3React();
+  const { sendIdeaDrawerDisclosure } = useIdeas();
+
+  async function handleSendIdea() {
+    try {
+      if (!account) {
+        throw new Error("Wallet not connected");
+      }
+
+      const contract = config.contracts.BoardIdeas(signer);
+
+      await (
+        await contract.functions.createIdea("some title", "some desc")
+      ).wait();
+
+      setTitle("");
+      setDescription("");
+    } catch (err) {
+      const error = err as Error;
+
+      console.log({ error });
+    }
+  }
 
   return (
     <Drawer
@@ -63,11 +94,11 @@ export function NewIdeaDrawer() {
 
               <Input
                 id="ideatitle"
-                value={titleContent}
-                onChange={(event) => setTitleContent(event.target.value)}
                 placeholder="Your idea title"
                 px="6"
                 py="6"
+                value={title}
+                onChange={({ target: { value } }) => setTitle(value)}
                 textColor="gray.300"
                 borderWidth="2px"
                 bgColor="gray.950"
@@ -90,11 +121,12 @@ export function NewIdeaDrawer() {
 
               <Textarea
                 id="desc"
-                value={descriptionContent}
-                onChange={(event) => setDescriptionContent(event.target.value)}
+                value={description}
+                onChange={({ target: { value } }) => setDescription(value)}
                 placeholder="Describe your amazing idea"
                 px="6"
                 py="6"
+                minH="12rem"
                 borderWidth="2px"
                 textColor="gray.300"
                 bgColor="gray.950"
@@ -125,11 +157,7 @@ export function NewIdeaDrawer() {
               Cancel
             </Button>
 
-            <Button
-              onClick={sendIdeaDrawerDisclosure.onOpen}
-              fontSize="lg"
-              colorScheme="yellow"
-            >
+            <Button onClick={handleSendIdea} fontSize="lg" colorScheme="yellow">
               Submit idea
             </Button>
           </Flex>

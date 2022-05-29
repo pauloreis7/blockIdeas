@@ -127,8 +127,6 @@ const tempIdeas = [
     description:
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum obcaecati rem numquam tenetur blanditiis eum nam, atque pariatur veniam sit minus porro minima autem voluptatem praesentium laborum vero quibusdam deleniti?",
     created_at: "17:05 - 28/05/2022",
-    votesCount: 14,
-    isVoted: true,
     upvotes: {
       votesCount: 14,
       isVoted: true,
