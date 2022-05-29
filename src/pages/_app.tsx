@@ -6,7 +6,7 @@ import { AppProvider } from "../contexts";
 
 import { theme } from "../styles/theme";
 import { getWeb3Library } from "../config/getWeb3LibraryProvider";
-// TODO
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Web3ReactProvider getLibrary={getWeb3Library}>
