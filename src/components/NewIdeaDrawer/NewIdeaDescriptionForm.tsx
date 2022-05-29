@@ -5,17 +5,20 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 
-import { useIdeas } from "../../contexts/IdeasContext";
+// types
+import type { Dispatch, SetStateAction } from "react";
 
 type NewIdeaDescriptionFormProps = {
   errorMessage?: string;
+  newIdeaDescription: string;
+  setNewIdeaDescription: Dispatch<SetStateAction<string>>;
 };
 
 export function NewIdeaDescriptionForm({
   errorMessage,
+  newIdeaDescription,
+  setNewIdeaDescription,
 }: NewIdeaDescriptionFormProps) {
-  const { newIdeaDescription, setNewIdeaDescription } = useIdeas();
-
   return (
     <FormControl isInvalid={!!errorMessage}>
       <FormLabel

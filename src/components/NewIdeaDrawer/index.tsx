@@ -28,24 +28,20 @@ import { NewIdeaTitleForm } from "./NewIdeaTitleForm";
 import { NewIdeaDescriptionForm } from "./NewIdeaDescriptionForm";
 
 export function NewIdeaDrawer() {
+  // states
+  const [newIdeaTitleError, setNewIdeaTitleError] = useState("");
+  const [newIdeaDescriptionError, setNewIdeaDescriptionError] = useState("");
+  const [newIdeaTitle, setNewIdeaTitle] = useState("");
+  const [newIdeaDescription, setNewIdeaDescription] = useState("");
+  const [isSendingIdea, setIsSendingIdea] = useState(false);
+
+  // hooks
   const { signer } = useSigner();
   const { account } = useWeb3React();
   const toast = useToast();
-
   const { data: userHasNFT, isLoading: userHasNFTIsLoading } =
     useGetNFT(account);
-
-  const {
-    sendIdeaDrawerDisclosure,
-    newIdeaTitle,
-    newIdeaDescription,
-    setNewIdeaTitle,
-    setNewIdeaDescription,
-  } = useIdeas();
-
-  const [newIdeaTitleError, setNewIdeaTitleError] = useState("");
-  const [newIdeaDescriptionError, setNewIdeaDescriptionError] = useState("");
-  const [isSendingIdea, setIsSendingIdea] = useState(false);
+  const { sendIdeaDrawerDisclosure } = useIdeas();
 
   const sendIdea = useMutation(
     async () => {
@@ -79,6 +75,9 @@ export function NewIdeaDrawer() {
           position: "top-right",
         });
 
+        setNewIdeaTitle("");
+        setNewIdeaDescription("");
+
         sendIdeaDrawerDisclosure.onClose();
       },
       onError: async (error: Error) => {
@@ -92,8 +91,6 @@ export function NewIdeaDrawer() {
         });
       },
       onSettled: (_, error) => {
-        setNewIdeaTitle("");
-        setNewIdeaDescription("");
         setIsSendingIdea(false);
       },
     }
@@ -156,10 +153,16 @@ export function NewIdeaDrawer() {
             {userHasNFT ? (
               <>
                 <Stack spacing="24px" mb="8">
-                  <NewIdeaTitleForm errorMessage={newIdeaTitleError} />
+                  <NewIdeaTitleForm
+                    newIdeaTitle={newIdeaTitle}
+                    errorMessage={newIdeaTitleError}
+                    setNewIdeaTitle={setNewIdeaTitle}
+                  />
 
                   <NewIdeaDescriptionForm
                     errorMessage={newIdeaDescriptionError}
+                    newIdeaDescription={newIdeaDescription}
+                    setNewIdeaDescription={setNewIdeaDescription}
                   />
                 </Stack>
 

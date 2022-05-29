@@ -61,8 +61,6 @@ export function MintAccessPass() {
           isClosable: true,
           position: "top-right",
         });
-
-        sendIdeaDrawerDisclosure.onClose();
       },
       onError: async (error: Error) => {
         toast({

@@ -11,8 +11,6 @@ import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { useToast } from "@chakra-ui/react";
 
 import { ConnectorsName, connectorTypes } from "../config/walletConnetors";
-// import { getWalletError } from "../functions/wallet/getWalletError";
-// import { getInactiveListener } from "../functions/wallet/getInactiveListener";
 
 type WalletProviderProps = PropsWithChildren<{}>;
 
@@ -64,10 +62,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }
   }, [activate]);
 
-  // useEffect(() => {
-  //   getInactiveListener({ activate, chainId });
-  // }, [activate, chainId]);
-
   useEffect(() => {
     const walletFormatted = account
       ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
@@ -101,8 +95,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     try {
       await activate(connectorTypes["metaMask"], undefined, true);
     } catch (err) {
-      console.log(err);
-
       const toastErrorMessage = (err as Error).message;
 
       toast({
@@ -114,9 +106,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
         position: "top-right",
       });
 
-      // const errorMessage = getWalletError(err as Error);
-
-      // setWeb3Error(errorMessage);
       setWeb3ErrorModalOpen(true);
     }
 
