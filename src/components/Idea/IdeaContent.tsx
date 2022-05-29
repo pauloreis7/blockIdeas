@@ -3,7 +3,7 @@ import { FiSearch } from "react-icons/fi";
 
 type IdeaProps = {
   description: string;
-  created_at: string;
+  created_at: string | Date;
 };
 
 export function IdeaContent({ description, created_at }: IdeaProps) {
@@ -23,7 +23,7 @@ export function IdeaContent({ description, created_at }: IdeaProps) {
       </Text>
 
       <Text w="100%" textAlign="right" color="gray.600">
-        {created_at}
+        {String(created_at)}
       </Text>
 
       <Button

@@ -6,7 +6,7 @@ import { VoteItem } from "./VoteItem";
 type IdeaProps = {
   title: string;
   description: string;
-  created_at: string;
+  created_at: string | Date;
   upvotes: {
     votesCount: number;
     isVoted: boolean;
@@ -42,7 +42,7 @@ export function Idea({
         py="3"
         backgroundColor="blackAlpha.300"
       >
-        <Text color="gray.400" fontWeight="600">
+        <Text color="gray.400" fontWeight="600" textTransform="uppercase">
           {title}
         </Text>
 

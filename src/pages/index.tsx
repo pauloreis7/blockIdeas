@@ -3,6 +3,7 @@ import {
   Text,
   Flex,
   Heading,
+  Image,
   SimpleGrid,
   Spinner,
   SkeletonText,
@@ -10,15 +11,19 @@ import {
 import Head from "next/head";
 
 import { useIdeas } from "../contexts/IdeasContext";
+import { useIdeasList } from "../hooks/cache/useIdeasList";
 
 import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
 import { WalletProfileModal } from "../components/WalletProfileModal";
 import { NewIdeaDrawer } from "../components/NewIdeaDrawer";
 import { Idea } from "../components/Idea";
+import { FailState } from "../components/FailState";
 
 export default function Home() {
-  const { sendIdeaDrawerDisclosure, isIdeasListLoading } = useIdeas();
+  const { sendIdeaDrawerDisclosure } = useIdeas();
+
+  const { data: ideas, isLoading, isFetching, error } = useIdeasList();
 
   return (
     <Flex
@@ -70,7 +75,7 @@ export default function Home() {
               ideas list
             </Heading>
 
-            {isIdeasListLoading && (
+            {(isLoading || isFetching) && (
               <>
                 <Spinner size="sm" color="gray.500" mr="2" />
 
@@ -88,7 +93,7 @@ export default function Home() {
         </Flex>
 
         <SkeletonText
-          isLoaded={!isIdeasListLoading}
+          isLoaded={!isLoading}
           w="100%"
           borderRadius="xl"
           startColor="gray.700"
@@ -96,58 +101,33 @@ export default function Home() {
           spacing="6"
           noOfLines={8}
         >
-          <SimpleGrid
-            w="100%"
-            h="100%"
-            gap="4"
-            minChildWidth="22rem"
-            alignItems="center"
-            justifyContent="center"
-          >
-            {tempIdeas.map((idea, i) => (
-              <Idea
-                key={i}
-                title={idea.title}
-                description={idea.description}
-                created_at={idea.created_at}
-                upvotes={idea.upvotes}
-                downvotes={idea.downvotes}
-              />
-            ))}
-          </SimpleGrid>
+          {error ? (
+            <FailState errorMessage="Fail to get ideas :/" />
+          ) : (
+            !isLoading && (
+              <SimpleGrid
+                w="100%"
+                h="100%"
+                gap="4"
+                minChildWidth="22rem"
+                alignItems="center"
+                justifyContent="center"
+              >
+                {ideas?.map((idea, i) => (
+                  <Idea
+                    key={i}
+                    title={idea.title}
+                    description={idea.description}
+                    created_at={idea.createdAt}
+                    upvotes={idea.upvotes}
+                    downvotes={idea.downvotes}
+                  />
+                ))}
+              </SimpleGrid>
+            )
+          )}
         </SkeletonText>
       </Flex>
     </Flex>
   );
 }
-
-const tempIdeas = [
-  {
-    title: "My custom title",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum obcaecati rem numquam tenetur blanditiis eum nam, atque pariatur veniam sit minus porro minima autem voluptatem praesentium laborum vero quibusdam deleniti?",
-    created_at: "17:05 - 28/05/2022",
-    upvotes: {
-      votesCount: 14,
-      isVoted: true,
-    },
-    downvotes: {
-      votesCount: 4,
-      isVoted: false,
-    },
-  },
-  {
-    title: "My custom title",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum obcaecati rem numquam tenetur blanditiis eum nam, atque pariatur veniam sit minus porro minima autem voluptatem praesentium laborum vero quibusdam deleniti?",
-    created_at: "17:05 - 28/05/2022",
-    upvotes: {
-      votesCount: 3,
-      isVoted: false,
-    },
-    downvotes: {
-      votesCount: 12,
-      isVoted: true,
-    },
-  },
-];

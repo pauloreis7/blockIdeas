@@ -42,9 +42,7 @@ export function NewIdeaDrawer() {
 
       const contract = config.contracts.BoardIdeas(signer);
 
-      await (
-        await contract.functions.createIdea("some title", "some desc")
-      ).wait();
+      await (await contract.functions.createIdea(title, description)).wait();
 
       setTitle("");
       setDescription("");
