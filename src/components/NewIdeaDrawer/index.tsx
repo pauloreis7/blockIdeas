@@ -95,10 +95,6 @@ export function NewIdeaDrawer() {
         setNewIdeaTitle("");
         setNewIdeaDescription("");
         setIsSendingIdea(false);
-
-        if (!error) {
-          queryClient.invalidateQueries(["ideasList"]);
-        }
       },
     }
   );

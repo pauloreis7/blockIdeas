@@ -30,6 +30,7 @@ import type {
 export interface BoardIdeasInterface extends utils.Interface {
   functions: {
     "ACCESS_PASS()": FunctionFragment;
+    "ACCESS_PASS_PRICE()": FunctionFragment;
     "URI()": FunctionFragment;
     "burnAccessPass()": FunctionFragment;
     "commentOnIdea(string,uint64)": FunctionFragment;
@@ -48,6 +49,7 @@ export interface BoardIdeasInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "ACCESS_PASS"
+      | "ACCESS_PASS_PRICE"
       | "URI"
       | "burnAccessPass"
       | "commentOnIdea"
@@ -65,6 +67,10 @@ export interface BoardIdeasInterface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "ACCESS_PASS",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ACCESS_PASS_PRICE",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "URI", values?: undefined): string;
@@ -118,6 +124,10 @@ export interface BoardIdeasInterface extends utils.Interface {
     functionFragment: "ACCESS_PASS",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "ACCESS_PASS_PRICE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "URI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "burnAccessPass",
@@ -151,7 +161,7 @@ export interface BoardIdeasInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "votes", data: BytesLike): Result;
 
   events: {
-    "IdeaCreated()": EventFragment;
+    "IdeaCreated(uint64)": EventFragment;
     "IdeaVotesUpdated(uint64)": EventFragment;
   };
 
@@ -159,8 +169,10 @@ export interface BoardIdeasInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "IdeaVotesUpdated"): EventFragment;
 }
 
-export interface IdeaCreatedEventObject {}
-export type IdeaCreatedEvent = TypedEvent<[], IdeaCreatedEventObject>;
+export interface IdeaCreatedEventObject {
+  _ideaId: BigNumber;
+}
+export type IdeaCreatedEvent = TypedEvent<[BigNumber], IdeaCreatedEventObject>;
 
 export type IdeaCreatedEventFilter = TypedEventFilter<IdeaCreatedEvent>;
 
@@ -203,6 +215,8 @@ export interface BoardIdeas extends BaseContract {
 
   functions: {
     ACCESS_PASS(overrides?: CallOverrides): Promise<[number]>;
+
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<[number]>;
 
     URI(overrides?: CallOverrides): Promise<[string]>;
 
@@ -279,6 +293,8 @@ export interface BoardIdeas extends BaseContract {
 
   ACCESS_PASS(overrides?: CallOverrides): Promise<number>;
 
+  ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<number>;
+
   URI(overrides?: CallOverrides): Promise<string>;
 
   burnAccessPass(
@@ -354,6 +370,8 @@ export interface BoardIdeas extends BaseContract {
   callStatic: {
     ACCESS_PASS(overrides?: CallOverrides): Promise<number>;
 
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<number>;
+
     URI(overrides?: CallOverrides): Promise<string>;
 
     burnAccessPass(overrides?: CallOverrides): Promise<void>;
@@ -421,8 +439,8 @@ export interface BoardIdeas extends BaseContract {
   };
 
   filters: {
-    "IdeaCreated()"(): IdeaCreatedEventFilter;
-    IdeaCreated(): IdeaCreatedEventFilter;
+    "IdeaCreated(uint64)"(_ideaId?: null): IdeaCreatedEventFilter;
+    IdeaCreated(_ideaId?: null): IdeaCreatedEventFilter;
 
     "IdeaVotesUpdated(uint64)"(_voteId?: null): IdeaVotesUpdatedEventFilter;
     IdeaVotesUpdated(_voteId?: null): IdeaVotesUpdatedEventFilter;
@@ -430,6 +448,8 @@ export interface BoardIdeas extends BaseContract {
 
   estimateGas: {
     ACCESS_PASS(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
     URI(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -487,6 +507,8 @@ export interface BoardIdeas extends BaseContract {
 
   populateTransaction: {
     ACCESS_PASS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     URI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

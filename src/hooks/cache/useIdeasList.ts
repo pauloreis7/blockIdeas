@@ -3,15 +3,15 @@ import dayjs from "dayjs";
 
 import { config } from "../../config";
 
-type IdeaProps = {
+export type IdeaProps = {
   id: number;
   title: string;
   description: string;
   createdBy: string;
   createdAt: string | Date;
-  upvotes: number
-  downvotes: number
-  isVoted: boolean
+  upvotes: number;
+  downvotes: number;
+  isVoted: boolean;
 };
 
 type GetIdeasListResponse = IdeaProps[];

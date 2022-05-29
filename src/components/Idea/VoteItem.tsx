@@ -97,7 +97,16 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
       if (!account) {
         setWalletModalOpen(true);
 
-        throw new Error("Wallet not connected");
+        toast({
+          title: "Wallet not connected",
+          description: "Please check your credentials",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          position: "top-right",
+        });
+
+        return;
       }
 
       if (!userHasNFT) {
@@ -108,16 +117,7 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
 
       await vote.mutateAsync();
     } catch (err) {
-      const error = err as Error;
-
-      toast({
-        title: error.message,
-        description: "Please check your credentials",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-        position: "top-right",
-      });
+      console.log({ err });
     }
   }
 

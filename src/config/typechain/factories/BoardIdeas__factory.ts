@@ -9,7 +9,14 @@ import type { BoardIdeas, BoardIdeasInterface } from "../BoardIdeas";
 const _abi = [
   {
     anonymous: false,
-    inputs: [],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint64",
+        name: "_ideaId",
+        type: "uint64",
+      },
+    ],
     name: "IdeaCreated",
     type: "event",
   },
@@ -29,6 +36,19 @@ const _abi = [
   {
     inputs: [],
     name: "ACCESS_PASS",
+    outputs: [
+      {
+        internalType: "uint8",
+        name: "",
+        type: "uint8",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "ACCESS_PASS_PRICE",
     outputs: [
       {
         internalType: "uint8",

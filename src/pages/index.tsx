@@ -7,10 +7,16 @@ import {
   Spinner,
   SkeletonText,
 } from "@chakra-ui/react";
+import { useEffect } from "react";
 import Head from "next/head";
+import { useMutation } from "react-query";
+import dayjs from "dayjs";
 
 import { useIdeas } from "../contexts/IdeasContext";
-import { useIdeasList } from "../hooks/cache/useIdeasList";
+import { queryClient } from "../services/queryClient";
+import { config } from "../config";
+
+import { useIdeasList, IdeaProps } from "../hooks/cache/useIdeasList";
 
 import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
@@ -18,6 +24,10 @@ import { WalletProfileModal } from "../components/WalletProfileModal";
 import { NewIdeaDrawer } from "../components/NewIdeaDrawer";
 import { Idea } from "../components/Idea";
 import { FailState } from "../components/FailState";
+
+type PreviusContext = {
+  previousIdeas: IdeaProps[];
+};
 
 export default function Home() {
   // hooks
@@ -27,7 +37,90 @@ export default function Home() {
     isLoading: ideasIsLoading,
     isFetching,
     error,
+    isFetchedAfterMount,
   } = useIdeasList();
+
+  const updateIdeasMutation = useMutation(
+    async (newIdeaId: number) => {
+      const contract = config.contracts.BoardIdeas();
+
+      const {
+        createdAt,
+        createdBy,
+        downvotes,
+        upvotes,
+        id,
+        description,
+        title,
+      } = await contract.functions.ideas(newIdeaId);
+
+      const formattedId = Number(id.toString());
+      const formattedUpvotes = Number(upvotes.toString());
+      const formattedDownvotes = Number(downvotes.toString());
+
+      const formattedCreatedAt = dayjs(
+        Number(createdAt.toString()) * 1000
+      ).format("HH:mm - MMM, DD YYYY");
+
+      const formattedIdea = {
+        title,
+        createdBy,
+        description,
+        isVoted: false,
+        id: formattedId,
+        upvotes: formattedUpvotes,
+        downvotes: formattedDownvotes,
+        createdAt: formattedCreatedAt,
+      };
+
+      await queryClient.cancelQueries("ideasList");
+
+      const previousIdeas = queryClient.getQueryData("ideasList");
+
+      queryClient.setQueryData("ideasList", (oldIdeas) => [
+        formattedIdea,
+        ...(oldIdeas as IdeaProps[]),
+      ]);
+
+      return { previousIdeas };
+    },
+    {
+      onError: (error, _, context) => {
+        console.log("error", { error });
+
+        const previousIdeas = (context as PreviusContext)?.previousIdeas;
+
+        if (!previousIdeas) {
+          return;
+        }
+
+        queryClient.setQueryData("ideasList", previousIdeas);
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries("ideasList");
+      },
+    }
+  );
+
+  useEffect(() => {
+    const contract = config.contracts.BoardIdeas();
+
+    async function updateIdeiaList(newIdeaId: number) {
+      if (!isFetchedAfterMount) {
+        return;
+      }
+
+      console.log("hiiiii");
+
+      await updateIdeasMutation.mutateAsync(newIdeaId);
+    }
+
+    contract.on("IdeaCreated", updateIdeiaList);
+
+    return () => {
+      contract.off("IdeaCreated", updateIdeiaList);
+    };
+  }, []);
 
   return (
     <Flex
