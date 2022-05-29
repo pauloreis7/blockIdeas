@@ -6,7 +6,7 @@ import { config } from "../../config";
 // types
 import type { VotesTypes } from "../../contexts/IdeasContext";
 
-type VoteProps = {
+export type VoteProps = {
   id: number;
   voter: string;
   voteType: VotesTypes;
