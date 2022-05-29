@@ -39,8 +39,6 @@ export default function Home() {
       : idea
   );
 
-  console.log({ formattedIdeas });
-
   return (
     <Flex
       w="100%"

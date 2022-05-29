@@ -1,7 +1,18 @@
+import {
+  Flex,
+  Text,
+  Button,
+  useToast,
+  Heading,
+  Tag,
+  TagLeftIcon,
+  TagLabel,
+  Image,
+} from "@chakra-ui/react";
 import { useMutation } from "react-query";
 import { useState, useEffect } from "react";
 import { useWeb3React } from "@web3-react/core";
-import { Flex, Text, Button, useToast } from "@chakra-ui/react";
+import { FiAlertCircle } from "react-icons/fi";
 
 // services
 import { queryClient } from "../../services/queryClient";
@@ -11,8 +22,13 @@ import { useSigner } from "../../hooks/useSigner";
 
 // web3
 import { config } from "../../config";
+import { useIdeas } from "../../contexts/IdeasContext";
+import { useWallet } from "../../contexts/WalletContext";
 
 export function MintAccessPass() {
+  const { setWalletModalOpen } = useWallet();
+  const { sendIdeaDrawerDisclosure } = useIdeas();
+
   // states
   const [isMinting, setIsMinting] = useState(false);
 
@@ -26,6 +42,8 @@ export function MintAccessPass() {
       setIsMinting(true);
 
       if (!account) {
+        setWalletModalOpen(true);
+
         throw new Error("Wallet not connected");
       }
 
@@ -35,7 +53,16 @@ export function MintAccessPass() {
     },
     {
       onSuccess: async (data) => {
-        setIsMinting(false);
+        toast({
+          title: "Access Pass Minted",
+          description: `Access Pass was mint successfully.`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+
+        sendIdeaDrawerDisclosure.onClose();
       },
       onError: async (error: Error) => {
         toast({
@@ -68,27 +95,56 @@ export function MintAccessPass() {
   return (
     <Flex direction="column" gap={4}>
       <Flex textAlign="center" direction="column">
-        <Text>You don&apos;t seem to have an Access Pass...</Text>
+        <Heading mb="4" textAlign="left" color="red.500" fontSize="2xl">
+          You don&apos;t have an Access Pass
+        </Heading>
 
-        <Text>
+        <Text mb="8" textAlign="left" color="gray.300" fontSize="lg">
           By having an Access Pass you can publish your own ideas and vote on
           other users&apos; ideas.
         </Text>
 
-        <Text>
-          It costs only{" "}
-          <Text as="span" color="#844DE2" fontWeight="bold">
-            1 MATIC
-          </Text>
-          !
-        </Text>
+        <Tag
+          maxWidth="16rem"
+          size="lg"
+          mb="2"
+          textAlign="left"
+          variant="subtle"
+          backgroundColor="transparent"
+          borderWidth="2px"
+          borderColor="gray.600"
+          color="gray.300"
+        >
+          <TagLeftIcon as={FiAlertCircle} boxSize="1.25rem" />
+
+          <TagLabel fontWeight="600">
+            It costs only
+            <Text as="span" ml="1" color="purple.500" fontWeight="bold">
+              1 MATIC
+            </Text>
+          </TagLabel>
+        </Tag>
+
+        <Image
+          src="/accessPassNFT.png"
+          alt="Ideas Chain Access Pass Nft"
+          w="34rem"
+          objectFit="cover"
+        />
       </Flex>
 
       <Button
-        colorScheme="yellow"
         onClick={handleMint}
         isLoading={isMinting}
-        loadingText="Minting..."
+        loadingText="Minting"
+        w="100%"
+        maxWidth="17rem"
+        px="4"
+        py="7"
+        colorScheme="yellow"
+        fontSize="2xl"
+        fontWeight="600"
+        borderRadius="full"
       >
         Mint now!
       </Button>

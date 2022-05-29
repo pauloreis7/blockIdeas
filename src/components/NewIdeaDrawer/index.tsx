@@ -34,6 +34,7 @@ export function NewIdeaDrawer() {
 
   const { data: userHasNFT, isLoading: userHasNFTIsLoading } =
     useGetNFT(account);
+
   const {
     sendIdeaDrawerDisclosure,
     newIdeaTitle,
@@ -69,10 +70,6 @@ export function NewIdeaDrawer() {
 
     {
       onSuccess: async (data) => {
-        setNewIdeaTitle("");
-        setNewIdeaDescription("");
-        setIsSendingIdea(false);
-
         toast({
           title: "Idea sent.",
           description: `Idea ${data?.newIdeaTitle} was sent successfully.`,
@@ -84,7 +81,7 @@ export function NewIdeaDrawer() {
 
         sendIdeaDrawerDisclosure.onClose();
       },
-      onError: async (error: Error, _, context: any) => {
+      onError: async (error: Error) => {
         toast({
           title: error.message,
           description: "Please try again",
@@ -94,7 +91,9 @@ export function NewIdeaDrawer() {
           position: "top-right",
         });
       },
-      onSettled: (data, error, variables, context) => {
+      onSettled: (_, error) => {
+        setNewIdeaTitle("");
+        setNewIdeaDescription("");
         setIsSendingIdea(false);
 
         if (!error) {
@@ -131,7 +130,7 @@ export function NewIdeaDrawer() {
       isOpen={sendIdeaDrawerDisclosure.isOpen}
       onClose={sendIdeaDrawerDisclosure.onClose}
       placement="right"
-      size="lg"
+      size={["full", "lg"]}
     >
       <DrawerOverlay />
 
@@ -151,7 +150,7 @@ export function NewIdeaDrawer() {
           mb="6"
           bg="gray.900"
         >
-          <Heading fontSize="2xl" color="gray.200">
+          <Heading fontSize="2xl" color="gray.300">
             Create a new idea
           </Heading>
         </DrawerHeader>

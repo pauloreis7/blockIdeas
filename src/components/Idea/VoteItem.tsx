@@ -3,19 +3,20 @@ import { useMutation } from "react-query";
 import { useWeb3React } from "@web3-react/core";
 import { CgArrowUp, CgArrowDown } from "react-icons/cg";
 import { Text, Icon, Tooltip, Button, useToast } from "@chakra-ui/react";
+import type { IconType } from "react-icons";
 
 // web3
 import { config } from "../../config";
 
 // hooks
 import { useSigner } from "../../hooks/useSigner";
+import { useGetNFT } from "../../hooks/cache/useGetNFT";
 
 // services
 import { queryClient } from "../../services/queryClient";
 
-// types
-import type { IconType } from "react-icons";
-import type { VotesTypes } from "../../contexts/IdeasContext";
+import { useWallet } from "../../contexts/WalletContext";
+import { useIdeas, VotesTypes } from "../../contexts/IdeasContext";
 
 const voteTypesProps: {
   [Key in VotesTypes]: { icon: IconType; color: string };
@@ -38,29 +39,28 @@ type VoteItemProps = {
 };
 
 export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
-  // states
-  const [isVoting, setIsVoting] = useState(false);
-
   // hooks
   const toast = useToast();
   const { signer } = useSigner();
   const { account } = useWeb3React();
 
+  const { setWalletModalOpen } = useWallet();
+  const { sendIdeaDrawerDisclosure } = useIdeas();
+
+  const { data: userHasNFT } = useGetNFT(account);
+
+  // states
+  const [isVoting, setIsVoting] = useState(false);
+
   const vote = useMutation(
     async () => {
       setIsVoting(true);
-
-      if (!account) {
-        throw new Error("Wallet not connected");
-      }
 
       const contract = config.contracts.BoardIdeas(signer);
       await (await contract.functions.voteOnIdea(voteType, id)).wait();
     },
     {
-      onSuccess: async (data) => {
-        setIsVoting(false);
-
+      onSuccess: async () => {
         toast({
           title: "Voted",
           description: `Successfuly voted`,
@@ -70,7 +70,9 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
           position: "top-right",
         });
       },
-      onError: async (error: Error,) => {
+      onError: async (error: Error, variables: void, context: unknown) => {
+        console.log({ error: Error, variables, context });
+
         toast({
           title: error.message,
           description: "Please try again",
@@ -80,7 +82,7 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
           position: "top-right",
         });
       },
-      onSettled: (data, error, variables, context) => {
+      onSettled: () => {
         setIsVoting(false);
 
         // if (!error) {
@@ -92,9 +94,30 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
 
   async function handleVote() {
     try {
+      if (!account) {
+        setWalletModalOpen(true);
+
+        throw new Error("Wallet not connected");
+      }
+
+      if (!userHasNFT) {
+        sendIdeaDrawerDisclosure.onOpen();
+
+        return;
+      }
+
       await vote.mutateAsync();
-    } catch (error) {
-      console.log({ error });
+    } catch (err) {
+      const error = err as Error;
+
+      toast({
+        title: error.message,
+        description: "Please check your credentials",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top-right",
+      });
     }
   }
 
@@ -109,6 +132,7 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
             _active={{}}
             _focus={{}}
             onClick={handleVote}
+            disabled={isVoting}
           >
             <Text
               display="flex"
@@ -139,7 +163,7 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
             _active={{}}
             _focus={{}}
             onClick={handleVote}
-
+            disabled={isVoting}
           >
             <Text
               display="flex"
