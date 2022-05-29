@@ -15,6 +15,7 @@ import {
   Textarea,
 } from '@chakra-ui/react'
 import { useState } from 'react'
+import { useWeb3React } from '@web3-react/core'
 
 // hooks
 import { useSigner } from '../../hooks/useSigner'
@@ -30,13 +31,18 @@ export function NewIdeaDrawer() {
 
   // hooks
   const { signer } = useSigner()
+  const { account } = useWeb3React()
   const { sendIdeaDrawerDisclosure } = useIdeas()
 
-  async function sendIdea() {
+  async function handleSendIdea() {
     try {
+      if (!account) {
+        throw new Error('Wallet not connected')
+      }
+
       const contract = config.contracts.BoardIdeas(signer)
 
-      const tx = await (
+      await (
         await contract.functions.createIdea('some title', 'some desc')
       ).wait()
 
@@ -150,7 +156,7 @@ export function NewIdeaDrawer() {
               Cancel
             </Button>
 
-            <Button onClick={sendIdea} fontSize='lg' colorScheme='yellow'>
+            <Button onClick={handleSendIdea} fontSize='lg' colorScheme='yellow'>
               Submit idea
             </Button>
           </Flex>

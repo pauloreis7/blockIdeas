@@ -13,42 +13,50 @@ import { config } from '../config'
 
 type IdeasProviderProps = PropsWithChildren<{}>
 
+type IdeaProps = {
+  title: string
+  description: string
+  createdBy: string
+  createdAt: string | Date
+  upvotes: {
+    votesCount: number
+    isVoted: boolean
+  }
+  downvotes: {
+    votesCount: number
+    isVoted: boolean
+  }
+}
+
 type IdeasContextData = {
-  ideas: Ideas[]
+  ideas: IdeaProps[]
   sendIdeaDrawerDisclosure: UseDisclosureReturn
   isIdeasListLoading: boolean
   setIsIdeasListLoading: (isLoading: boolean) => void
-  handleSendIdea: () => Promise<string | void>
 }
 
 export type VotesTypes = 'upvote' | 'downvote'
-export type Ideas = {
-  id: number
-  title: string
-  upvotes: number
-  createdBy: string
-  downvotes: number
-  description: string
-  createdAt: string | Date
-}
 
 const IdeasContext = createContext({} as IdeasContextData)
 
 export function IdeasProvider({ children }: IdeasProviderProps) {
   // states
-  const [ideas, setIdeas] = useState<Ideas[]>([])
+  const [ideas, setIdeas] = useState<IdeaProps[]>([])
 
   // hooks
   const disclosure = useDisclosure()
+  const { account, activate, deactivate, connector } = useWeb3React()
 
   async function fetchIdeas() {
+    setIsIdeasListLoading(true)
+
     try {
       const contract = config.contracts.BoardIdeas()
 
       const [totalIdeas] = await contract.functions.totalIdeas()
       const formattedTotalIdeas = Number(totalIdeas.toString())
 
-      const ideas = []
+      const ideas: IdeaProps[] = []
       for (let i = 0; i < formattedTotalIdeas; i++) {
         const {
           createdAt,
@@ -71,8 +79,8 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
           createdBy,
           description,
           id: formattedId,
-          upvotes: formattedUpvotes,
-          downvotes: formattedDownvotes,
+          upvotes: { votesCount: formattedUpvotes, isVoted: false },
+          downvotes: { votesCount: formattedDownvotes, isVoted: false },
           createdAt: formattedCreatedAt,
         }
         ideas.push(formattedIdea)
@@ -90,7 +98,6 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
   useEffect(() => {
     ;(async () => await fetchIdeas())()
   }, [])
-  const { account, activate, deactivate, connector } = useWeb3React()
 
   const [isIdeasListLoading, setIsIdeasListLoading] = useState(false)
 
@@ -117,7 +124,6 @@ export function IdeasProvider({ children }: IdeasProviderProps) {
         sendIdeaDrawerDisclosure: disclosure,
         isIdeasListLoading,
         setIsIdeasListLoading,
-        handleSendIdea,
       }}
     >
       {children}
