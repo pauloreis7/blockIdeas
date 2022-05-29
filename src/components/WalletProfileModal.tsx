@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 
-import { useWallet } from "../../contexts/WalletContext";
+import { useWallet } from "../contexts/WalletContext";
 
 export function WalletProfileModal() {
   const { active } = useWeb3React();

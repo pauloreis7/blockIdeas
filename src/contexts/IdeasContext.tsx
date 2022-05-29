@@ -1,10 +1,19 @@
-import React, { createContext, PropsWithChildren, useContext } from "react";
+import React, {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useState,
+} from "react";
 import { useDisclosure, UseDisclosureReturn } from "@chakra-ui/hooks";
 
 type IdeasProviderProps = PropsWithChildren<{}>;
 
 type IdeasContextData = {
   sendIdeaDrawerDisclosure: UseDisclosureReturn;
+  newIdeaTitle: string;
+  newIdeaDescription: string;
+  setNewIdeaDescription: (description: string) => void;
+  setNewIdeaTitle: (title: string) => void;
 };
 
 export type VotesTypes = "upvote" | "downvote";
@@ -14,10 +23,17 @@ const IdeasContext = createContext({} as IdeasContextData);
 export function IdeasProvider({ children }: IdeasProviderProps) {
   const disclosure = useDisclosure();
 
+  const [newIdeaTitle, setNewIdeaTitle] = useState("");
+  const [newIdeaDescription, setNewIdeaDescription] = useState("");
+
   return (
     <IdeasContext.Provider
       value={{
         sendIdeaDrawerDisclosure: disclosure,
+        newIdeaTitle,
+        newIdeaDescription,
+        setNewIdeaDescription,
+        setNewIdeaTitle,
       }}
     >
       {children}

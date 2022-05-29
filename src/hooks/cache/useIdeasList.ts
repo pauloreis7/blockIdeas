@@ -34,9 +34,9 @@ export async function getIdeasList(): Promise<GetIdeasListResponse> {
     const formattedUpvotes = Number(upvotes.toString());
     const formattedDownvotes = Number(downvotes.toString());
 
-    const formattedCreatedAt = dayjs(createdAt.toString()).format(
-      "HH:mm - DD MMM YYYY"
-    );
+    const formattedCreatedAt = dayjs(
+      Number(createdAt.toString()) * 1000
+    ).format("HH:mm - DD MMM YYYY");
 
     const formattedIdea = {
       title,
@@ -51,7 +51,7 @@ export async function getIdeasList(): Promise<GetIdeasListResponse> {
     ideas.push(formattedIdea);
   }
 
-  return ideas;
+  return ideas.reverse();
 }
 
 export function useIdeasList() {

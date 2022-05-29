@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Drawer,
   DrawerBody,
@@ -8,49 +7,115 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  FormLabel,
   Heading,
-  Input,
   Stack,
-  Textarea,
+  useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { useWeb3React } from "@web3-react/core";
+import { useState } from "react";
+import { useMutation } from "react-query";
 
-// hooks
-import { useSigner } from "../../hooks/useSigner";
 import { useIdeas } from "../../contexts/IdeasContext";
+import { useSigner } from "../../hooks/useSigner";
 
-// web3
+import { queryClient } from "../../services/queryClient";
 import { config } from "../../config";
 
-export function NewIdeaDrawer() {
-  // states
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+import { NewIdeaTitleForm } from "./NewIdeaTitleForm";
+import { NewIdeaDescriptionForm } from "./NewIdeaDescriptionForm";
 
-  // hooks
+export function NewIdeaDrawer() {
   const { signer } = useSigner();
   const { account } = useWeb3React();
-  const { sendIdeaDrawerDisclosure } = useIdeas();
+  const toast = useToast();
 
-  async function handleSendIdea() {
-    try {
+  const {
+    sendIdeaDrawerDisclosure,
+    newIdeaTitle,
+    newIdeaDescription,
+    setNewIdeaTitle,
+    setNewIdeaDescription,
+  } = useIdeas();
+
+  const [newIdeaTitleError, setNewIdeaTitleError] = useState("");
+  const [newIdeaDescriptionError, setNewIdeaDescriptionError] = useState("");
+  const [isSendingIdea, setIsSendingIdea] = useState(false);
+
+  const sendIdea = useMutation(
+    async () => {
+      setNewIdeaTitleError("");
+      setNewIdeaDescriptionError("");
+      setIsSendingIdea(true);
+
       if (!account) {
         throw new Error("Wallet not connected");
+
+        return;
+      }
+
+      if (!newIdeaTitle) {
+        const errorMessage = "Idea title is required";
+
+        setNewIdeaTitleError(errorMessage);
+        return;
+      }
+
+      if (!newIdeaDescription) {
+        const errorMessage = "Idea description is required";
+
+        setNewIdeaDescriptionError(errorMessage);
+        return;
       }
 
       const contract = config.contracts.BoardIdeas(signer);
 
-      await (await contract.functions.createIdea(title, description)).wait();
+      await (
+        await contract.functions.createIdea(newIdeaTitle, newIdeaDescription)
+      ).wait();
 
-      setTitle("");
-      setDescription("");
-    } catch (err) {
-      const error = err as Error;
+      await queryClient.cancelQueries(["ideasList"]);
 
-      console.log({ error });
+      const previousIdeasList = queryClient.getQueryData(["ideasList"]);
+
+      return { newIdeaTitle };
+    },
+
+    {
+      onError: async (error: Error, _, context: any) => {
+        setIsSendingIdea(false);
+        toast({
+          title: error.message,
+          description: "Please try again",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      },
+      onSuccess: async (_, ideaTitle) => {
+        setNewIdeaTitle("");
+        setNewIdeaDescription("");
+        setIsSendingIdea(false);
+
+        console.log(ideaTitle);
+
+        toast({
+          title: "Idea sent.",
+          description: `Idea ${ideaTitle} was sent successfully.`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+
+        queryClient.invalidateQueries(["ideasList"]);
+        sendIdeaDrawerDisclosure.onClose();
+      },
     }
+  );
+
+  async function handleSendIdea() {
+    await sendIdea.mutateAsync();
   }
 
   return (
@@ -85,60 +150,9 @@ export function NewIdeaDrawer() {
 
         <DrawerBody>
           <Stack spacing="24px" mb="8">
-            <Box>
-              <FormLabel htmlFor="ideatitle" fontSize="lg" color="gray.400">
-                Title
-              </FormLabel>
+            <NewIdeaTitleForm errorMessage={newIdeaTitleError} />
 
-              <Input
-                id="ideatitle"
-                placeholder="Your idea title"
-                px="6"
-                py="6"
-                value={title}
-                onChange={({ target: { value } }) => setTitle(value)}
-                textColor="gray.300"
-                borderWidth="2px"
-                bgColor="gray.950"
-                variant="filled"
-                borderColor="gray.950"
-                _hover={{
-                  borderColor: "yellow.500",
-                }}
-                _focus={{
-                  bgColor: "gray.950",
-                  borderColor: "yellow.500",
-                }}
-              />
-            </Box>
-
-            <Box>
-              <FormLabel htmlFor="desc" fontSize="lg" color="gray.400">
-                Description
-              </FormLabel>
-
-              <Textarea
-                id="desc"
-                value={description}
-                onChange={({ target: { value } }) => setDescription(value)}
-                placeholder="Describe your amazing idea"
-                px="6"
-                py="6"
-                minH="12rem"
-                borderWidth="2px"
-                textColor="gray.300"
-                bgColor="gray.950"
-                variant="filled"
-                borderColor="gray.950"
-                _hover={{
-                  borderColor: "yellow.500",
-                }}
-                _focus={{
-                  bgColor: "gray.950",
-                  borderColor: "yellow.500",
-                }}
-              />
-            </Box>
+            <NewIdeaDescriptionForm errorMessage={newIdeaDescriptionError} />
           </Stack>
 
           <Flex>
@@ -155,7 +169,13 @@ export function NewIdeaDrawer() {
               Cancel
             </Button>
 
-            <Button onClick={handleSendIdea} fontSize="lg" colorScheme="yellow">
+            <Button
+              onClick={handleSendIdea}
+              isLoading={isSendingIdea}
+              loadingText="Sending"
+              fontSize="lg"
+              colorScheme="yellow"
+            >
               Submit idea
             </Button>
           </Flex>
