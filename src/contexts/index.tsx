@@ -1,21 +1,16 @@
-import { ReactNode } from 'react'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactNode } from "react";
 
-import { WalletProvider } from './WalletContext'
-import { IdeasProvider } from './IdeasContext'
-
-const queryClient = new QueryClient()
+import { WalletProvider } from "./WalletContext";
+import { IdeasProvider } from "./IdeasContext";
 
 type AppProviderProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 export function AppProvider({ children }: AppProviderProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <WalletProvider>
-        <IdeasProvider>{children}</IdeasProvider>
-      </WalletProvider>
-    </QueryClientProvider>
-  )
+    <WalletProvider>
+      <IdeasProvider>{children}</IdeasProvider>
+    </WalletProvider>
+  );
 }
