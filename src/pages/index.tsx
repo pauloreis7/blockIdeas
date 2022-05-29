@@ -77,24 +77,23 @@ export default function Home() {
 
       const previousIdeas = queryClient.getQueryData("ideasList");
 
-      queryClient.setQueryData("ideasList", (oldIdeas) => [
-        formattedIdea,
-        ...(oldIdeas as IdeaProps[]),
-      ]);
+      queryClient.setQueryData("ideasList", (oldIdeas) => {
+        if (!oldIdeas) {
+          throw new Error("no old ideas");
+        }
+
+        return [formattedIdea, ...(oldIdeas as IdeaProps[])];
+      });
 
       return { previousIdeas };
     },
     {
       onError: (error, _, context) => {
-        console.log("error", { error });
-
         const previousIdeas = (context as PreviusContext)?.previousIdeas;
 
-        if (!previousIdeas) {
-          return;
+        if (previousIdeas) {
+          queryClient.setQueryData("ideasList", previousIdeas);
         }
-
-        queryClient.setQueryData("ideasList", previousIdeas);
       },
       onSettled: () => {
         queryClient.invalidateQueries("ideasList");
@@ -106,13 +105,11 @@ export default function Home() {
     const contract = config.contracts.BoardIdeas();
 
     async function updateIdeiaList(newIdeaId: number) {
-      if (!isFetchedAfterMount) {
-        return;
+      try {
+        await updateIdeasMutation.mutateAsync(newIdeaId);
+      } catch (error) {
+        console.log({ error });
       }
-
-      console.log("hiiiii");
-
-      await updateIdeasMutation.mutateAsync(newIdeaId);
     }
 
     contract.on("IdeaCreated", updateIdeiaList);
