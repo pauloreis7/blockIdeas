@@ -8,10 +8,8 @@ import {
   SkeletonText,
 } from "@chakra-ui/react";
 import Head from "next/head";
-import { useWeb3React } from "@web3-react/core";
 
 import { useIdeas } from "../contexts/IdeasContext";
-import { useVotesList } from "../hooks/cache/useVotesList";
 import { useIdeasList } from "../hooks/cache/useIdeasList";
 
 import { Header } from "../components/Header";
@@ -23,21 +21,13 @@ import { FailState } from "../components/FailState";
 
 export default function Home() {
   // hooks
-  const { account } = useWeb3React();
   const { sendIdeaDrawerDisclosure } = useIdeas();
-  const { data: votes, isLoading: votesIsLoading } = useVotesList(account);
   const {
     data: ideas,
     isLoading: ideasIsLoading,
     isFetching,
     error,
   } = useIdeasList();
-
-  const formattedIdeas = ideas?.map((idea) =>
-    idea.id === votes?.find((vote) => vote.id === idea.id)?.id
-      ? { ...idea, ...votes?.find((vote) => vote.id === idea.id) }
-      : idea
-  );
 
   return (
     <Flex

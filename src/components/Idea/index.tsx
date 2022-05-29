@@ -1,21 +1,18 @@
+import { useWeb3React } from "@web3-react/core";
 import { Box, Text, Flex } from "@chakra-ui/react";
 
 import { IdeaContent } from "./IdeaContent";
 import { VoteItem } from "./VoteItem";
+
+import { useVotesList } from "../../hooks/cache/useVotesList";
 
 type IdeaProps = {
   id: number;
   title: string;
   description: string;
   created_at: string | Date;
-  upvotes: {
-    votesCount: number;
-    isVoted: boolean;
-  };
-  downvotes: {
-    votesCount: number;
-    isVoted: boolean;
-  };
+  upvotes: number;
+  downvotes: number;
 };
 
 export function Idea({
@@ -26,6 +23,10 @@ export function Idea({
   upvotes,
   downvotes,
 }: IdeaProps) {
+  // hooks
+  const { account } = useWeb3React();
+  const { data: votes, isLoading: votesIsLoading } = useVotesList(account);
+
   return (
     <Box
       w="100%"
@@ -52,15 +53,19 @@ export function Idea({
           <VoteItem
             id={id}
             voteType={2}
-            isVoted={upvotes.isVoted}
-            votesCount={upvotes.votesCount}
+            isVoted={
+              votes && votes.find((vote) => vote.id === id)?.voteType === 2
+            }
+            votesCount={upvotes}
           />
 
           <VoteItem
             id={id}
             voteType={1}
-            isVoted={downvotes.isVoted}
-            votesCount={downvotes.votesCount}
+            isVoted={
+              votes && votes.find((vote) => vote.id === id)?.voteType === 1
+            }
+            votesCount={downvotes}
           />
         </Flex>
       </Flex>

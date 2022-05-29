@@ -31,7 +31,7 @@ async function fetchVotesList(
     const { voter, voteType } = await contract.functions.votes(i, account);
 
     const formattedVote = {
-      id: 0,
+      id: i,
       voter,
       voteType,
     };

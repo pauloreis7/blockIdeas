@@ -9,14 +9,9 @@ type IdeaProps = {
   description: string;
   createdBy: string;
   createdAt: string | Date;
-  upvotes: {
-    votesCount: number;
-    isVoted: boolean;
-  };
-  downvotes: {
-    votesCount: number;
-    isVoted: boolean;
-  };
+  upvotes: number
+  downvotes: number
+  isVoted: boolean
 };
 
 type GetIdeasListResponse = IdeaProps[];
@@ -43,9 +38,10 @@ export async function getIdeasList(): Promise<GetIdeasListResponse> {
       title,
       createdBy,
       description,
+      isVoted: false,
       id: formattedId,
-      upvotes: { votesCount: formattedUpvotes, isVoted: false },
-      downvotes: { votesCount: formattedDownvotes, isVoted: false },
+      upvotes: formattedUpvotes,
+      downvotes: formattedDownvotes,
       createdAt: formattedCreatedAt,
     };
 

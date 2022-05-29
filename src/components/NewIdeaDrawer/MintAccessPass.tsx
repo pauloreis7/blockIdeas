@@ -105,7 +105,7 @@ export function MintAccessPass() {
         </Text>
 
         <Tag
-          maxWidth="16rem"
+          maxWidth="17rem"
           size="lg"
           mb="2"
           textAlign="left"
@@ -120,7 +120,7 @@ export function MintAccessPass() {
           <TagLabel fontWeight="600">
             It costs only
             <Text as="span" ml="1" color="purple.500" fontWeight="bold">
-              1 MATIC
+              1 Wei of MATIC
             </Text>
           </TagLabel>
         </Tag>
