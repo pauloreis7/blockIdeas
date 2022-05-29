@@ -8,8 +8,10 @@ import {
   SkeletonText,
 } from "@chakra-ui/react";
 import Head from "next/head";
+import { useWeb3React } from "@web3-react/core";
 
 import { useIdeas } from "../contexts/IdeasContext";
+import { useVotesList } from "../hooks/cache/useVotesList";
 import { useIdeasList } from "../hooks/cache/useIdeasList";
 
 import { Header } from "../components/Header";
@@ -20,9 +22,24 @@ import { Idea } from "../components/Idea";
 import { FailState } from "../components/FailState";
 
 export default function Home() {
+  // hooks
+  const { account } = useWeb3React();
   const { sendIdeaDrawerDisclosure } = useIdeas();
+  const { data: votes, isLoading: votesIsLoading } = useVotesList(account);
+  const {
+    data: ideas,
+    isLoading: ideasIsLoading,
+    isFetching,
+    error,
+  } = useIdeasList();
 
-  const { data: ideas, isLoading, isFetching, error } = useIdeasList();
+  const formattedIdeas = ideas?.map((idea) =>
+    idea.id === votes?.find((vote) => vote.id === idea.id)?.id
+      ? { ...idea, ...votes?.find((vote) => vote.id === idea.id) }
+      : idea
+  );
+
+  console.log({ formattedIdeas });
 
   return (
     <Flex
@@ -74,7 +91,7 @@ export default function Home() {
               ideas list
             </Heading>
 
-            {(isLoading || isFetching) && (
+            {(ideasIsLoading || isFetching) && (
               <>
                 <Spinner size="sm" color="gray.500" mr="2" />
 
@@ -92,7 +109,7 @@ export default function Home() {
         </Flex>
 
         <SkeletonText
-          isLoaded={!isLoading}
+          isLoaded={!ideasIsLoading}
           w="100%"
           borderRadius="xl"
           startColor="gray.700"
@@ -103,7 +120,7 @@ export default function Home() {
           {error ? (
             <FailState errorMessage="Fail to get ideas :/" />
           ) : (
-            !isLoading && (
+            !ideasIsLoading && (
               <SimpleGrid
                 w="100%"
                 h="100%"
@@ -112,9 +129,10 @@ export default function Home() {
                 alignItems="center"
                 justifyContent="center"
               >
-                {ideas?.map((idea, i) => (
+                {ideas?.map((idea) => (
                   <Idea
-                    key={i}
+                    id={idea.id}
+                    key={idea.id}
                     title={idea.title}
                     description={idea.description}
                     created_at={idea.createdAt}

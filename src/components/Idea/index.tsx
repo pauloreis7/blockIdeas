@@ -4,6 +4,7 @@ import { IdeaContent } from "./IdeaContent";
 import { VoteItem } from "./VoteItem";
 
 type IdeaProps = {
+  id: number;
   title: string;
   description: string;
   created_at: string | Date;
@@ -18,6 +19,7 @@ type IdeaProps = {
 };
 
 export function Idea({
+  id,
   title,
   description,
   created_at,
@@ -48,13 +50,15 @@ export function Idea({
 
         <Flex alignItems="center">
           <VoteItem
-            voteType="upvote"
+            id={id}
+            voteType={2}
             isVoted={upvotes.isVoted}
             votesCount={upvotes.votesCount}
           />
 
           <VoteItem
-            voteType="downvote"
+            id={id}
+            voteType={1}
             isVoted={downvotes.isVoted}
             votesCount={downvotes.votesCount}
           />

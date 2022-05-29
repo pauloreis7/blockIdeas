@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { config } from "../../config";
 
 type IdeaProps = {
+  id: number;
   title: string;
   description: string;
   createdBy: string;
@@ -18,7 +19,7 @@ type IdeaProps = {
   };
 };
 
-type GetIdeasListResponse = IdeaProps[] | undefined;
+type GetIdeasListResponse = IdeaProps[];
 
 export async function getIdeasList(): Promise<GetIdeasListResponse> {
   const contract = config.contracts.BoardIdeas();
@@ -36,7 +37,7 @@ export async function getIdeasList(): Promise<GetIdeasListResponse> {
 
     const formattedCreatedAt = dayjs(
       Number(createdAt.toString()) * 1000
-    ).format("HH:mm - DD MMM YYYY");
+    ).format("HH:mm - MMM, DD YYYY");
 
     const formattedIdea = {
       title,

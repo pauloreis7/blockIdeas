@@ -16,7 +16,10 @@ type IdeasContextData = {
   setNewIdeaTitle: (title: string) => void;
 };
 
-export type VotesTypes = "upvote" | "downvote";
+export enum VotesTypes {
+  Downvote = 1,
+  Upvote,
+}
 
 const IdeasContext = createContext({} as IdeasContextData);
 
