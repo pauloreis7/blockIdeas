@@ -16,7 +16,12 @@ export function NewIdeaTitleForm({ errorMessage }: NewIdeaTitleFormProps) {
 
   return (
     <FormControl isInvalid={!!errorMessage}>
-      <FormLabel htmlFor="ideatitle" fontSize="lg" color="gray.400">
+      <FormLabel
+        htmlFor="ideatitle"
+        fontSize="lg"
+        fontWeight="bold"
+        color="gray.200"
+      >
         Title
       </FormLabel>
 

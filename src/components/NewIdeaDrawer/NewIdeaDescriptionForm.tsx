@@ -18,7 +18,12 @@ export function NewIdeaDescriptionForm({
 
   return (
     <FormControl isInvalid={!!errorMessage}>
-      <FormLabel htmlFor="desc" fontSize="lg" color="gray.400">
+      <FormLabel
+        htmlFor="desc"
+        fontSize="lg"
+        fontWeight="bold"
+        color="gray.200"
+      >
         Description
       </FormLabel>
 

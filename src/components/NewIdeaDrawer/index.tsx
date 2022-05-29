@@ -9,18 +9,21 @@ import {
   Flex,
   Heading,
   Stack,
+  SkeletonText,
   useToast,
 } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 import { useState } from "react";
 import { useMutation } from "react-query";
 
+import { useGetNFT } from "../../hooks/cache/useGetNFT";
 import { useIdeas } from "../../contexts/IdeasContext";
 import { useSigner } from "../../hooks/useSigner";
 
 import { queryClient } from "../../services/queryClient";
 import { config } from "../../config";
 
+import { MintAccessPass } from "./MintAccessPass";
 import { NewIdeaTitleForm } from "./NewIdeaTitleForm";
 import { NewIdeaDescriptionForm } from "./NewIdeaDescriptionForm";
 
@@ -29,6 +32,8 @@ export function NewIdeaDrawer() {
   const { account } = useWeb3React();
   const toast = useToast();
 
+  const { data: userHasNFT, isLoading: userHasNFTIsLoading } =
+    useGetNFT(account);
   const {
     sendIdeaDrawerDisclosure,
     newIdeaTitle,
@@ -146,42 +151,52 @@ export function NewIdeaDrawer() {
           mb="6"
           bg="gray.900"
         >
-          <Heading fontSize="2xl" color="gray.400">
+          <Heading fontSize="2xl" color="gray.200">
             Create a new idea
           </Heading>
         </DrawerHeader>
 
         <DrawerBody>
-          <Stack spacing="24px" mb="8">
-            <NewIdeaTitleForm errorMessage={newIdeaTitleError} />
+          <SkeletonText isLoaded={!userHasNFTIsLoading}>
+            {userHasNFT ? (
+              <>
+                <Stack spacing="24px" mb="8">
+                  <NewIdeaTitleForm errorMessage={newIdeaTitleError} />
 
-            <NewIdeaDescriptionForm errorMessage={newIdeaDescriptionError} />
-          </Stack>
+                  <NewIdeaDescriptionForm
+                    errorMessage={newIdeaDescriptionError}
+                  />
+                </Stack>
 
-          <Flex>
-            <Button
-              onClick={sendIdeaDrawerDisclosure.onClose}
-              variant="outline"
-              mr="1rem"
-              colorScheme="red"
-              borderWidth="2px"
-              borderColor="red.500"
-              fontSize="lg"
-              _hover={{ color: "gray.50", backgroundColor: "red.500" }}
-            >
-              Cancel
-            </Button>
+                <Flex>
+                  <Button
+                    onClick={sendIdeaDrawerDisclosure.onClose}
+                    variant="outline"
+                    mr="1rem"
+                    colorScheme="red"
+                    borderWidth="2px"
+                    borderColor="red.500"
+                    fontSize="lg"
+                    _hover={{ color: "gray.50", backgroundColor: "red.500" }}
+                  >
+                    Cancel
+                  </Button>
 
-            <Button
-              onClick={handleSendIdea}
-              isLoading={isSendingIdea}
-              loadingText="Sending"
-              fontSize="lg"
-              colorScheme="yellow"
-            >
-              Submit idea
-            </Button>
-          </Flex>
+                  <Button
+                    onClick={handleSendIdea}
+                    isLoading={isSendingIdea}
+                    loadingText="Sending"
+                    fontSize="lg"
+                    colorScheme="yellow"
+                  >
+                    Submit idea
+                  </Button>
+                </Flex>
+              </>
+            ) : (
+              <MintAccessPass />
+            )}
+          </SkeletonText>
         </DrawerBody>
       </DrawerContent>
     </Drawer>

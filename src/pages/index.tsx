@@ -3,7 +3,6 @@ import {
   Text,
   Flex,
   Heading,
-  Image,
   SimpleGrid,
   Spinner,
   SkeletonText,

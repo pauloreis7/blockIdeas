@@ -9,8 +9,8 @@ import type { Signer } from "ethers";
 import type { Provider } from "@ethersproject/providers";
 
 const defaultProvider = new providers.JsonRpcProvider(
-  "https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6"
-);
+  'https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6'
+)
 
 const commonConfig = {
   abi: {
@@ -29,11 +29,10 @@ const commonConfig = {
 };
 const config = {
   supportedChainIds: [80001],
-  url: "https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6",
+  url: 'https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6',
   walletConnect: {
     rpc: {
-      80001:
-        "https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6",
+      80001: 'https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6',
     },
   },
   ...commonConfig,
