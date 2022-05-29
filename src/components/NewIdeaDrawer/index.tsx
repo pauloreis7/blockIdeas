@@ -49,22 +49,6 @@ export function NewIdeaDrawer() {
 
       if (!account) {
         throw new Error("Wallet not connected");
-
-        return;
-      }
-
-      if (!newIdeaTitle) {
-        const errorMessage = "Idea title is required";
-
-        setNewIdeaTitleError(errorMessage);
-        return;
-      }
-
-      if (!newIdeaDescription) {
-        const errorMessage = "Idea description is required";
-
-        setNewIdeaDescriptionError(errorMessage);
-        return;
       }
 
       const contract = config.contracts.BoardIdeas(signer);
@@ -75,14 +59,27 @@ export function NewIdeaDrawer() {
 
       await queryClient.cancelQueries(["ideasList"]);
 
-      const previousIdeasList = queryClient.getQueryData(["ideasList"]);
-
       return { newIdeaTitle };
     },
 
     {
-      onError: async (error: Error, _, context: any) => {
+      onSuccess: async (data) => {
+        setNewIdeaTitle("");
+        setNewIdeaDescription("");
         setIsSendingIdea(false);
+
+        toast({
+          title: "Idea sent.",
+          description: `Idea ${data?.newIdeaTitle} was sent successfully.`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+
+        sendIdeaDrawerDisclosure.onClose();
+      },
+      onError: async (error: Error, _, context: any) => {
         toast({
           title: error.message,
           description: "Please try again",
@@ -92,30 +89,36 @@ export function NewIdeaDrawer() {
           position: "top-right",
         });
       },
-      onSuccess: async (_, ideaTitle) => {
-        setNewIdeaTitle("");
-        setNewIdeaDescription("");
+      onSettled: (data, error, variables, context) => {
         setIsSendingIdea(false);
 
-        console.log(ideaTitle);
-
-        toast({
-          title: "Idea sent.",
-          description: `Idea ${ideaTitle} was sent successfully.`,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-          position: "top-right",
-        });
-
-        queryClient.invalidateQueries(["ideasList"]);
-        sendIdeaDrawerDisclosure.onClose();
+        if (!error) {
+          queryClient.invalidateQueries(["ideasList"]);
+        }
       },
     }
   );
 
   async function handleSendIdea() {
-    await sendIdea.mutateAsync();
+    if (!newIdeaTitle) {
+      const errorMessage = "Idea title is required";
+
+      setNewIdeaTitleError(errorMessage);
+      return;
+    }
+
+    if (!newIdeaDescription) {
+      const errorMessage = "Idea description is required";
+
+      setNewIdeaDescriptionError(errorMessage);
+      return;
+    }
+
+    try {
+      await sendIdea.mutateAsync();
+    } catch (error) {
+      console.log({ error });
+    }
   }
 
   return (
