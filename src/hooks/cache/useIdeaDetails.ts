@@ -82,6 +82,6 @@ export async function getIdeaDetails(
 
 export function useIdeaDetails(ideaId: number) {
   return useQuery(["ideaDetails", ideaId], () => getIdeaDetails(ideaId), {
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 3, // 3 minutes
   });
 }
