@@ -23,7 +23,6 @@ type WalletContextData = {
   walletFormatted: string | null;
   isWalletModalOpen: boolean;
   isWalletProfileModalOpen: boolean;
-  showChainError: boolean;
   isWeb3ErrorModalOpen: boolean;
   setWeb3Error: (web3Error: Web3Error) => void;
   setWalletModalOpen: (isOpen: boolean) => void;
@@ -43,7 +42,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
   const toast = useToast();
 
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
-  const [showChainError, setShowChainError] = useState(false);
   const [isWalletProfileModalOpen, setIsWalletProfileModalOpen] =
     useState(false);
   const [isWeb3ErrorModalOpen, setWeb3ErrorModalOpen] = useState(false);
@@ -72,7 +70,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
       : null;
 
     setWalletFormatted(walletFormatted);
-    setShowChainError(false);
 
     if (connector) {
       const connectorTypes = {
@@ -111,7 +108,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
         position: "top-right",
       });
 
-      setShowChainError(true);
       setWeb3ErrorModalOpen(true);
     }
 
@@ -130,7 +126,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     activate(walletConnect, (err) => {
       if (walletConnect && walletConnect instanceof WalletConnectConnector) {
         walletConnect.walletConnectProvider = undefined;
-        setShowChainError(true);
       }
 
       toast({
@@ -164,7 +159,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
         walletFormatted,
         isWalletModalOpen,
         isWalletProfileModalOpen,
-        showChainError,
         isWeb3ErrorModalOpen,
         setWalletModalOpen,
         setIsWalletProfileModalOpen,

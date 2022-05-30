@@ -7,12 +7,10 @@ import {
   Button,
   useToast,
 } from "@chakra-ui/react";
-import { useRouter } from 'next/router'
 
 export function UnsupportedNetwork() {
   // hooks
   const toast = useToast();
-  const router = useRouter()
 
   async function switchChain() {
     try {
@@ -20,8 +18,6 @@ export function UnsupportedNetwork() {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: "0x13881" }], // it is the 80001 chain Id but encoded in hexadecimal and prefixed with 0x
       });
-
-      router.reload()
     } catch (err) {
       const error = err as Error & { code: number };
 
@@ -37,8 +33,6 @@ export function UnsupportedNetwork() {
               },
             ],
           });
-
-          router.reload()
         } catch (err) {
           const error = err as Error;
 
