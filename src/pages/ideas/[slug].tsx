@@ -161,8 +161,8 @@ export default function Idea() {
             </Heading>
           </SkeletonText>
 
-          <Stack w="100%" maxWidth="md" spacing="6" mb="5">
-            <SkeletonText isLoaded={idea !== null}>
+          <SkeletonText isLoaded={idea !== null}>
+            <Stack w="100%" maxWidth="md" spacing="6" mb="5">
               <IdeaStatsItem
                 title="created at"
                 value={idea?.createdAt}
@@ -185,8 +185,8 @@ export default function Idea() {
                 color="red.500"
                 onClick={() => handleVote(VoteTypes.DownVote)}
               />
-            </SkeletonText>
-          </Stack>
+            </Stack>
+          </SkeletonText>
 
           <Divider mb="4" borderColor="gray.600" />
 
