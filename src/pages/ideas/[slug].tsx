@@ -7,12 +7,14 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
 import { useWeb3React } from "@web3-react/core";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FiClock } from "react-icons/fi";
 import { FaRegCommentDots } from "react-icons/fa";
 import { CgArrowUp, CgArrowDown } from "react-icons/cg";
+import dayjs from "dayjs";
 
 import { Header } from "../../components/Header";
 import { ConnectWalletModal } from "../../components/ConnectWalletModal";
@@ -21,9 +23,92 @@ import { BackButton } from "../../components/IdeaDetails/BackButton";
 import { IdeaStatsItem } from "../../components/IdeaDetails/IdeaStatsItem";
 import { Comment } from "../../components/IdeaDetails/Comment";
 
+import { useSigner } from "../../hooks/useSigner";
+import { config } from "../../config";
+
+type Idea = {
+  id: number;
+  title: string;
+  description: string;
+  createdBy: string;
+  createdAt: string | Date;
+  upvotes: number;
+  downvotes: number;
+  isVoted: boolean;
+};
+
+enum VoteTypes {
+  DownVote = 1,
+  UpVote,
+}
+
 export default function Idea() {
+  // states
+  const [idea, setIdea] = useState<Idea | null>(null);
+
+  // hooks
+  const { signer } = useSigner();
   const { account } = useWeb3React();
   const { query } = useRouter();
+
+  async function fetchIdea() {
+    try {
+      const contract = config.contracts.BoardIdeas();
+
+      const {
+        createdAt,
+        createdBy,
+        downvotes,
+        upvotes,
+        id,
+        description,
+        title,
+      } = await contract.functions.ideas(String(query.slug));
+      const formattedId = Number(id.toString());
+      const formattedUpvotes = Number(upvotes.toString());
+      const formattedDownvotes = Number(downvotes.toString());
+
+      const formattedCreatedAt = dayjs(
+        Number(createdAt.toString()) * 1000
+      ).format("HH:mm - MMM, DD YYYY");
+
+      const formattedIdea = {
+        title,
+        createdBy,
+        description,
+        isVoted: false,
+        id: formattedId,
+        upvotes: formattedUpvotes,
+        downvotes: formattedDownvotes,
+        createdAt: formattedCreatedAt,
+      };
+
+      setIdea(formattedIdea);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function handleVote(voteType: VoteTypes) {
+    try {
+      const contract = config.contracts.BoardIdeas(signer);
+
+      await (
+        await contract.functions.voteOnIdea(voteType, idea?.id as number)
+      ).wait();
+
+      await fetchIdea();
+    } catch (err) {
+      console.log({ err });
+    }
+  }
+
+  // fetch idea
+  useEffect(() => {
+    if (typeof query.slug === "string") {
+      (async () => await fetchIdea())();
+    }
+  }, [query]);
 
   return (
     <Flex
@@ -70,29 +155,31 @@ export default function Idea() {
           mt="4"
         >
           <Heading mb="6" fontSize="5xl" color="gray.100" fontWeight="600">
-            My idea
+            {idea?.title}
           </Heading>
 
           <Stack w="100%" maxWidth="md" spacing="6" mb="5">
             <IdeaStatsItem
               title="created at"
-              value="May 23, 2022 7:08 PM"
+              value={idea?.createdAt}
               icon={FiClock}
               color="gray.400"
             />
 
             <IdeaStatsItem
               title="up votes"
-              value="14"
+              value={idea?.upvotes}
               icon={CgArrowUp}
               color="green.500"
+              onClick={() => handleVote(VoteTypes.UpVote)}
             />
 
             <IdeaStatsItem
               title="down votes"
-              value="5"
+              value={idea?.downvotes}
               icon={CgArrowDown}
               color="red.500"
+              onClick={() => handleVote(VoteTypes.DownVote)}
             />
           </Stack>
 
@@ -126,9 +213,7 @@ export default function Idea() {
           <Divider mt="4" mb="8" borderColor="gray.600" />
 
           <Text mb="12" color="gray.100">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam quis
-            illo aliquam repudiandae enim? Cupiditate quod ipsum expedita iusto
-            fuga, vero ullam quis quae numquam vitae ad sed ea distinctio!
+            {idea?.description}
           </Text>
 
           <Stack w="100%" spacing="6">

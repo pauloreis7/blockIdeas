@@ -1,12 +1,16 @@
 import { Button, Box, Text, Icon } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { FiSearch } from "react-icons/fi";
 
 type IdeaProps = {
   description: string;
   created_at: string | Date;
+  id: number;
 };
 
-export function IdeaContent({ description, created_at }: IdeaProps) {
+export function IdeaContent({ id, description, created_at }: IdeaProps) {
+  const router = useRouter();
+
   return (
     <Box
       px="4"
@@ -27,6 +31,7 @@ export function IdeaContent({ description, created_at }: IdeaProps) {
       </Text>
 
       <Button
+        onClick={() => router.push(`ideas/${id}`)}
         position="absolute"
         bottom="0"
         left="35%"

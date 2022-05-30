@@ -33,7 +33,17 @@ export function Header() {
     >
       <Logo />
 
-      {chainId !== config.supportedChainIds[0] ? (
+      {/* {account && connectorName ? (
+        <WalletProfile
+          walletFormatted={walletFormatted}
+          connectorName={connectorName}
+          handleOpenWalletProfileModal={setIsWalletProfileModalOpen}
+        />
+      ) : (
+        <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
+      )} */}
+
+      {chainId && chainId !== config.supportedChainIds[0] ? (
         <UnsupportedNetwork />
       ) : account && connectorName ? (
         <WalletProfile
