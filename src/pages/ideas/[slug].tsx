@@ -154,13 +154,11 @@ export default function Idea() {
           mt="4"
         >
           <SkeletonText isLoaded={idea !== null} mb="5">
-            <Flex justify="space-between" align="center" gap='2'>
-              <Heading mb="6" fontSize="5xl" color="gray.100" fontWeight="600">
-                {idea?.title}
-              </Heading>
+            <BackButton />
 
-              <BackButton />
-            </Flex>
+            <Heading my="6" fontSize="5xl" color="gray.100" fontWeight="600">
+              {idea?.title}
+            </Heading>
           </SkeletonText>
 
           <SkeletonText isLoaded={idea !== null}>
