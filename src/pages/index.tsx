@@ -108,21 +108,6 @@ export default function Home() {
         oldIdeasArray[updatedIdeaIndex].upvotes = upVotes;
         oldIdeasArray[updatedIdeaIndex].downvotes = downVotes;
 
-        // if (formattedVote.voteType === 1) {
-        //   oldIdeasArray[updatedIdeaIndex].downvotes--;
-        //   oldIdeasArray[updatedIdeaIndex].upvotes =
-        //     oldIdeasArray[updatedIdeaIndex].upvotes - 1;
-        // }
-
-        // if (formattedVote.voteType === 2) {
-        //   oldIdeasArray[updatedIdeaIndex].upvotes++;
-        //   oldIdeasArray[updatedIdeaIndex].downvotes++;
-        // }
-
-        // if (formattedVote.voteType === 0) {
-        //   oldIdeasArray[updatedIdeaIndex].downvotes--;
-        // }
-
         return oldIdeasArray;
       });
 
@@ -220,6 +205,7 @@ export default function Home() {
       upVotes: number,
       downVotes: number
     ) {
+      console.log("ifff");
       if (!account) {
         return;
       }
