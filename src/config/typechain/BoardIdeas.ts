@@ -171,13 +171,26 @@ export interface BoardIdeasInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "votes", data: BytesLike): Result;
 
   events: {
+    "IdeaCommented(uint64,uint64)": EventFragment;
     "IdeaCreated(uint64)": EventFragment;
     "IdeaVotesUpdated(uint64,uint64,int64)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "IdeaCommented"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "IdeaCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "IdeaVotesUpdated"): EventFragment;
 }
+
+export interface IdeaCommentedEventObject {
+  _ideaId: BigNumber;
+  _commentIndex: BigNumber;
+}
+export type IdeaCommentedEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  IdeaCommentedEventObject
+>;
+
+export type IdeaCommentedEventFilter = TypedEventFilter<IdeaCommentedEvent>;
 
 export interface IdeaCreatedEventObject {
   _ideaId: BigNumber;
@@ -466,6 +479,15 @@ export interface BoardIdeas extends BaseContract {
   };
 
   filters: {
+    "IdeaCommented(uint64,uint64)"(
+      _ideaId?: null,
+      _commentIndex?: null
+    ): IdeaCommentedEventFilter;
+    IdeaCommented(
+      _ideaId?: null,
+      _commentIndex?: null
+    ): IdeaCommentedEventFilter;
+
     "IdeaCreated(uint64)"(_ideaId?: null): IdeaCreatedEventFilter;
     IdeaCreated(_ideaId?: null): IdeaCreatedEventFilter;
 

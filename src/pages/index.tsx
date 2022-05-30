@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import Head from "next/head";
-import { useWeb3React } from "@web3-react/core";
 import { useMutation } from "react-query";
 import dayjs from "dayjs";
 import { FiExternalLink } from "react-icons/fi";
@@ -19,7 +18,6 @@ import { queryClient } from "../services/queryClient";
 import { config } from "../config";
 
 import { useIdeasList, IdeaProps } from "../hooks/cache/useIdeasList";
-import { VoteProps } from "../hooks/cache/useVotesList";
 
 import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
@@ -32,21 +30,7 @@ type PreviusIdeasContext = {
   previousIdeas: IdeaProps[];
 };
 
-type PreviusVotesContext = {
-  previousVotes: VoteProps[];
-  newVote: VoteProps;
-};
-
-type UpdateVotesMutationProps = {
-  newVoteId: number;
-  account: string;
-  upVotes: number;
-  downVotes: number;
-};
-
 export default function Home() {
-  const { account } = useWeb3React();
-
   // hooks
   const { sendIdeaDrawerDisclosure } = useIdeas();
   const {
