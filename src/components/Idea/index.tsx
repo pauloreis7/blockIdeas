@@ -27,8 +27,6 @@ export function Idea({
   const { account } = useWeb3React();
   const { data: votes, isLoading: votesIsLoading } = useVotesList(account);
 
-  // console.log(votes);
-
   return (
     <Box
       w="100%"

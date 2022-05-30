@@ -162,7 +162,7 @@ export interface BoardIdeasInterface extends utils.Interface {
 
   events: {
     "IdeaCreated(uint64)": EventFragment;
-    "IdeaVotesUpdated(uint64)": EventFragment;
+    "IdeaVotesUpdated(uint64,uint8)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "IdeaCreated"): EventFragment;
@@ -178,9 +178,10 @@ export type IdeaCreatedEventFilter = TypedEventFilter<IdeaCreatedEvent>;
 
 export interface IdeaVotesUpdatedEventObject {
   _voteId: BigNumber;
+  _voteType: number;
 }
 export type IdeaVotesUpdatedEvent = TypedEvent<
-  [BigNumber],
+  [BigNumber, number],
   IdeaVotesUpdatedEventObject
 >;
 
@@ -442,8 +443,14 @@ export interface BoardIdeas extends BaseContract {
     "IdeaCreated(uint64)"(_ideaId?: null): IdeaCreatedEventFilter;
     IdeaCreated(_ideaId?: null): IdeaCreatedEventFilter;
 
-    "IdeaVotesUpdated(uint64)"(_voteId?: null): IdeaVotesUpdatedEventFilter;
-    IdeaVotesUpdated(_voteId?: null): IdeaVotesUpdatedEventFilter;
+    "IdeaVotesUpdated(uint64,uint8)"(
+      _voteId?: null,
+      _voteType?: null
+    ): IdeaVotesUpdatedEventFilter;
+    IdeaVotesUpdated(
+      _voteId?: null,
+      _voteType?: null
+    ): IdeaVotesUpdatedEventFilter;
   };
 
   estimateGas: {

@@ -29,6 +29,12 @@ const _abi = [
         name: "_voteId",
         type: "uint64",
       },
+      {
+        indexed: false,
+        internalType: "enum Test.VoteTypes",
+        name: "_voteType",
+        type: "uint8",
+      },
     ],
     name: "IdeaVotesUpdated",
     type: "event",
@@ -266,7 +272,7 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "enum BoardIdeas.VoteTypes",
+        internalType: "enum Test.VoteTypes",
         name: "_voteType",
         type: "uint8",
       },
@@ -302,7 +308,7 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "enum BoardIdeas.VoteTypes",
+        internalType: "enum Test.VoteTypes",
         name: "voteType",
         type: "uint8",
       },

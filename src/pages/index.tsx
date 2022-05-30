@@ -39,6 +39,8 @@ type PreviusVotesContext = {
 type UpdateVotesMutationProps = {
   newVoteId: number;
   account: string;
+  upVotes: number;
+  downVotes: number;
 };
 
 export default function Home() {
@@ -54,7 +56,12 @@ export default function Home() {
   } = useIdeasList();
 
   const updateVotesMutation = useMutation(
-    async ({ newVoteId, account }: UpdateVotesMutationProps) => {
+    async ({
+      newVoteId,
+      upVotes,
+      downVotes,
+      account,
+    }: UpdateVotesMutationProps) => {
       const contract = config.contracts.BoardIdeas();
 
       console.log("innn", { newVoteId, account });
@@ -98,13 +105,23 @@ export default function Home() {
         console.log({ updatedIdeaIndex });
         console.log({ oldIdeasArray });
 
-        if (formattedVote.voteType === 1) {
-          oldIdeasArray[updatedIdeaIndex].downvotes--;
-        }
+        oldIdeasArray[updatedIdeaIndex].upvotes = upVotes;
+        oldIdeasArray[updatedIdeaIndex].downvotes = downVotes;
 
-        if (formattedVote.voteType === 2) {
-          oldIdeasArray[updatedIdeaIndex].upvotes++;
-        }
+        // if (formattedVote.voteType === 1) {
+        //   oldIdeasArray[updatedIdeaIndex].downvotes--;
+        //   oldIdeasArray[updatedIdeaIndex].upvotes =
+        //     oldIdeasArray[updatedIdeaIndex].upvotes - 1;
+        // }
+
+        // if (formattedVote.voteType === 2) {
+        //   oldIdeasArray[updatedIdeaIndex].upvotes++;
+        //   oldIdeasArray[updatedIdeaIndex].downvotes++;
+        // }
+
+        // if (formattedVote.voteType === 0) {
+        //   oldIdeasArray[updatedIdeaIndex].downvotes--;
+        // }
 
         return oldIdeasArray;
       });
@@ -198,16 +215,24 @@ export default function Home() {
       }
     }
 
-    async function updateVotesList(newVoteId: number) {
+    async function updateVotesList(
+      newVoteId: number,
+      upVotes: number,
+      downVotes: number
+    ) {
       if (!account) {
-        console.log("iffff");
         return;
       }
 
       try {
-        console.log("mutate", newVoteId);
+        console.log({ newVoteId, upVotes, downVotes });
 
-        await updateVotesMutation.mutateAsync({ newVoteId, account });
+        await updateVotesMutation.mutateAsync({
+          newVoteId,
+          upVotes,
+          downVotes,
+          account,
+        });
       } catch (error) {
         console.log({ error });
       }
