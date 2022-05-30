@@ -1,15 +1,15 @@
-import { providers } from 'ethers'
+import { providers } from "ethers";
 
 // web3
-import BoardIdeasABI from './ABIs/BoardIdeas.json'
-import { BoardIdeas__factory } from './typechain'
+import BoardIdeasABI from "./ABIs/BoardIdeas.json";
+import { BoardIdeas__factory } from "./typechain";
 
 // types
-import type { Signer } from 'ethers'
-import type { Provider } from '@ethersproject/providers'
+import type { Signer } from "ethers";
+import type { Provider } from "@ethersproject/providers";
 
 const defaultProvider = new providers.JsonRpcProvider(
-  'https://rpc-mumbai.matic.today'
+  'https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6'
 )
 
 const commonConfig = {
@@ -26,16 +26,16 @@ const commonConfig = {
   smartContractAddresses: {
     BoardIdeas: process.env.NEXT_PUBLIC_BOARD_IDEAS_SMART_CONTRACT_ADDRESS,
   },
-}
+};
 const config = {
   supportedChainIds: [80001],
-  url: 'https://rpc-mumbai.matic.today',
+  url: 'https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6',
   walletConnect: {
     rpc: {
-      80001: 'https://rpc-mumbai.matic.today',
+      80001: 'https://polygon-mumbai.g.alchemy.com/v2/YJrlt931GSZHqab7sJs2YwtZ2VYIiQr6',
     },
   },
   ...commonConfig,
-}
+};
 
-export { config }
+export { config };

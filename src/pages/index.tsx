@@ -7,18 +7,191 @@ import {
   Spinner,
   SkeletonText,
 } from "@chakra-ui/react";
+import { useEffect } from "react";
 import Head from "next/head";
+import { useWeb3React } from "@web3-react/core";
+import { useMutation } from "react-query";
+import dayjs from "dayjs";
 
 import { useIdeas } from "../contexts/IdeasContext";
+import { queryClient } from "../services/queryClient";
+import { config } from "../config";
+
+import { useIdeasList, IdeaProps } from "../hooks/cache/useIdeasList";
+import { VoteProps } from "../hooks/cache/useVotesList";
 
 import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
 import { WalletProfileModal } from "../components/WalletProfileModal";
 import { NewIdeaDrawer } from "../components/NewIdeaDrawer";
 import { Idea } from "../components/Idea";
+import { FailState } from "../components/FailState";
+
+type PreviusIdeasContext = {
+  previousIdeas: IdeaProps[];
+};
+
+type PreviusVotesContext = {
+  previousVotes: VoteProps[];
+  newVote: VoteProps;
+};
+
+type UpdateVotesMutationProps = {
+  newVoteId: number;
+  account: string;
+};
 
 export default function Home() {
-  const { sendIdeaDrawerDisclosure, isIdeasListLoading } = useIdeas();
+  const { account } = useWeb3React();
+
+  // hooks
+  const { sendIdeaDrawerDisclosure } = useIdeas();
+  const {
+    data: ideas,
+    isLoading: ideasIsLoading,
+    isFetching,
+    error,
+  } = useIdeasList();
+
+  const updateVotesMutation = useMutation(
+    async ({ newVoteId, account }: UpdateVotesMutationProps) => {
+      const contract = config.contracts.BoardIdeas();
+
+      console.log("innn", { newVoteId, account });
+
+      const { voter, voteType } = await contract.functions.votes(
+        newVoteId,
+        account
+      );
+
+      const formattedVote = {
+        id: Number(newVoteId.toString()),
+        voter,
+        voteType,
+      };
+
+      console.log(formattedVote);
+
+      await queryClient.cancelQueries(["votesList", newVoteId]);
+
+      const previousVotes = queryClient.getQueryData(["votesList", newVoteId]);
+
+      console.log(previousVotes);
+
+      queryClient.setQueryData(["votesList", newVoteId], formattedVote);
+
+      return { previousVotes, formattedVote };
+    },
+    {
+      onError: (error, _, context) => {
+        const previousVotes = (context as PreviusVotesContext)?.previousVotes;
+        const newVote = (context as PreviusVotesContext)?.newVote;
+
+        if (previousVotes) {
+          queryClient.setQueryData(["votesList", newVote.id], newVote);
+        }
+      },
+      onSettled: (context) => {
+        queryClient.invalidateQueries(["votesList", context?.formattedVote.id]);
+      },
+    }
+  );
+
+  const updateIdeasMutation = useMutation(
+    async (newIdeaId: number) => {
+      const contract = config.contracts.BoardIdeas();
+
+      const {
+        createdAt,
+        createdBy,
+        downvotes,
+        upvotes,
+        id,
+        description,
+        title,
+      } = await contract.functions.ideas(newIdeaId);
+
+      const formattedId = Number(id.toString());
+      const formattedUpvotes = Number(upvotes.toString());
+      const formattedDownvotes = Number(downvotes.toString());
+
+      const formattedCreatedAt = dayjs(
+        Number(createdAt.toString()) * 1000
+      ).format("HH:mm - MMM, DD YYYY");
+
+      const formattedIdea = {
+        title,
+        createdBy,
+        description,
+        isVoted: false,
+        id: formattedId,
+        upvotes: formattedUpvotes,
+        downvotes: formattedDownvotes,
+        createdAt: formattedCreatedAt,
+      };
+
+      await queryClient.cancelQueries("ideasList");
+
+      const previousIdeas = queryClient.getQueryData("ideasList");
+
+      queryClient.setQueryData("ideasList", (oldIdeas) => {
+        if (!oldIdeas) {
+          throw new Error("no old ideas");
+        }
+
+        return [formattedIdea, ...(oldIdeas as IdeaProps[])];
+      });
+
+      return { previousIdeas };
+    },
+    {
+      onError: (error, _, context) => {
+        const previousIdeas = (context as PreviusIdeasContext)?.previousIdeas;
+
+        if (previousIdeas) {
+          queryClient.setQueryData("ideasList", previousIdeas);
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries("ideasList");
+      },
+    }
+  );
+
+  useEffect(() => {
+    const contract = config.contracts.BoardIdeas();
+
+    async function updateIdeiasList(newIdeaId: number) {
+      try {
+        await updateIdeasMutation.mutateAsync(newIdeaId);
+      } catch (error) {
+        console.log({ error });
+      }
+    }
+
+    async function updateVotesList(newVoteId: number) {
+      if (!account) {
+        console.log("iffff");
+        return;
+      }
+
+      try {
+        console.log("mutate", newVoteId);
+
+        await updateVotesMutation.mutateAsync({ newVoteId, account });
+      } catch (error) {
+        console.log({ error });
+      }
+    }
+
+    contract.on("IdeaCreated", updateIdeiasList);
+    contract.on("IdeaVotesUpdated", updateVotesList);
+
+    return () => {
+      contract.off("IdeaCreated", updateIdeiasList);
+      contract.off("IdeaVotesUpdated", updateVotesList);
+    };
+  }, []);
 
   return (
     <Flex
@@ -70,7 +243,7 @@ export default function Home() {
               ideas list
             </Heading>
 
-            {isIdeasListLoading && (
+            {(ideasIsLoading || isFetching) && (
               <>
                 <Spinner size="sm" color="gray.500" mr="2" />
 
@@ -88,7 +261,7 @@ export default function Home() {
         </Flex>
 
         <SkeletonText
-          isLoaded={!isIdeasListLoading}
+          isLoaded={!ideasIsLoading}
           w="100%"
           borderRadius="xl"
           startColor="gray.700"
@@ -96,58 +269,34 @@ export default function Home() {
           spacing="6"
           noOfLines={8}
         >
-          <SimpleGrid
-            w="100%"
-            h="100%"
-            gap="4"
-            minChildWidth="22rem"
-            alignItems="center"
-            justifyContent="center"
-          >
-            {tempIdeas.map((idea, i) => (
-              <Idea
-                key={i}
-                title={idea.title}
-                description={idea.description}
-                created_at={idea.created_at}
-                upvotes={idea.upvotes}
-                downvotes={idea.downvotes}
-              />
-            ))}
-          </SimpleGrid>
+          {error ? (
+            <FailState errorMessage="Fail to get ideas :/" />
+          ) : (
+            !ideasIsLoading && (
+              <SimpleGrid
+                w="100%"
+                h="100%"
+                gap="4"
+                minChildWidth="22rem"
+                alignItems="center"
+                justifyContent="center"
+              >
+                {ideas?.map((idea) => (
+                  <Idea
+                    id={idea.id}
+                    key={idea.id}
+                    title={idea.title}
+                    description={idea.description}
+                    created_at={idea.createdAt}
+                    upvotes={idea.upvotes}
+                    downvotes={idea.downvotes}
+                  />
+                ))}
+              </SimpleGrid>
+            )
+          )}
         </SkeletonText>
       </Flex>
     </Flex>
   );
 }
-
-const tempIdeas = [
-  {
-    title: "My custom title",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum obcaecati rem numquam tenetur blanditiis eum nam, atque pariatur veniam sit minus porro minima autem voluptatem praesentium laborum vero quibusdam deleniti?",
-    created_at: "17:05 - 28/05/2022",
-    upvotes: {
-      votesCount: 14,
-      isVoted: true,
-    },
-    downvotes: {
-      votesCount: 4,
-      isVoted: false,
-    },
-  },
-  {
-    title: "My custom title",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum obcaecati rem numquam tenetur blanditiis eum nam, atque pariatur veniam sit minus porro minima autem voluptatem praesentium laborum vero quibusdam deleniti?",
-    created_at: "17:05 - 28/05/2022",
-    upvotes: {
-      votesCount: 3,
-      isVoted: false,
-    },
-    downvotes: {
-      votesCount: 12,
-      isVoted: true,
-    },
-  },
-];

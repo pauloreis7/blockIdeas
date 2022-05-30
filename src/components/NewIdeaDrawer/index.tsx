@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Drawer,
   DrawerBody,
@@ -8,34 +7,48 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  FormLabel,
   Heading,
-  Input,
   Stack,
-  Textarea,
+  SkeletonText,
+  useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { useWeb3React } from "@web3-react/core";
+import { useState } from "react";
+import { useMutation } from "react-query";
 
-// hooks
-import { useSigner } from "../../hooks/useSigner";
+import { useGetNFT } from "../../hooks/cache/useGetNFT";
 import { useIdeas } from "../../contexts/IdeasContext";
+import { useSigner } from "../../hooks/useSigner";
 
-// web3
+import { queryClient } from "../../services/queryClient";
 import { config } from "../../config";
+
+import { MintAccessPass } from "./MintAccessPass";
+import { NewIdeaTitleForm } from "./NewIdeaTitleForm";
+import { NewIdeaDescriptionForm } from "./NewIdeaDescriptionForm";
 
 export function NewIdeaDrawer() {
   // states
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [newIdeaTitleError, setNewIdeaTitleError] = useState("");
+  const [newIdeaDescriptionError, setNewIdeaDescriptionError] = useState("");
+  const [newIdeaTitle, setNewIdeaTitle] = useState("");
+  const [newIdeaDescription, setNewIdeaDescription] = useState("");
+  const [isSendingIdea, setIsSendingIdea] = useState(false);
 
   // hooks
   const { signer } = useSigner();
   const { account } = useWeb3React();
+  const toast = useToast();
+  const { data: userHasNFT, isLoading: userHasNFTIsLoading } =
+    useGetNFT(account);
   const { sendIdeaDrawerDisclosure } = useIdeas();
 
-  async function handleSendIdea() {
-    try {
+  const sendIdea = useMutation(
+    async () => {
+      setNewIdeaTitleError("");
+      setNewIdeaDescriptionError("");
+      setIsSendingIdea(true);
+
       if (!account) {
         throw new Error("Wallet not connected");
       }
@@ -43,14 +56,64 @@ export function NewIdeaDrawer() {
       const contract = config.contracts.BoardIdeas(signer);
 
       await (
-        await contract.functions.createIdea("some title", "some desc")
+        await contract.functions.createIdea(newIdeaTitle, newIdeaDescription)
       ).wait();
 
-      setTitle("");
-      setDescription("");
-    } catch (err) {
-      const error = err as Error;
+      await queryClient.cancelQueries(["ideasList"]);
 
+      return { newIdeaTitle };
+    },
+
+    {
+      onSuccess: async (data) => {
+        toast({
+          title: "Idea sent.",
+          description: `Idea ${data?.newIdeaTitle} was sent successfully.`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+
+        setNewIdeaTitle("");
+        setNewIdeaDescription("");
+
+        sendIdeaDrawerDisclosure.onClose();
+      },
+      onError: async (error: Error) => {
+        toast({
+          title: error.message,
+          description: "Please try again",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      },
+      onSettled: (_, error) => {
+        setIsSendingIdea(false);
+      },
+    }
+  );
+
+  async function handleSendIdea() {
+    if (!newIdeaTitle) {
+      const errorMessage = "Idea title is required";
+
+      setNewIdeaTitleError(errorMessage);
+      return;
+    }
+
+    if (!newIdeaDescription) {
+      const errorMessage = "Idea description is required";
+
+      setNewIdeaDescriptionError(errorMessage);
+      return;
+    }
+
+    try {
+      await sendIdea.mutateAsync();
+    } catch (error) {
       console.log({ error });
     }
   }
@@ -60,7 +123,7 @@ export function NewIdeaDrawer() {
       isOpen={sendIdeaDrawerDisclosure.isOpen}
       onClose={sendIdeaDrawerDisclosure.onClose}
       placement="right"
-      size="lg"
+      size={["full", "lg"]}
     >
       <DrawerOverlay />
 
@@ -80,87 +143,58 @@ export function NewIdeaDrawer() {
           mb="6"
           bg="gray.900"
         >
-          <Heading fontSize="2xl" color="gray.400">
+          <Heading fontSize="2xl" color="gray.300">
             Create a new idea
           </Heading>
         </DrawerHeader>
 
         <DrawerBody>
-          <Stack spacing="24px" mb="8">
-            <Box>
-              <FormLabel htmlFor="ideatitle" fontSize="lg" color="gray.400">
-                Title
-              </FormLabel>
+          <SkeletonText isLoaded={!userHasNFTIsLoading}>
+            {userHasNFT ? (
+              <>
+                <Stack spacing="24px" mb="8">
+                  <NewIdeaTitleForm
+                    newIdeaTitle={newIdeaTitle}
+                    errorMessage={newIdeaTitleError}
+                    setNewIdeaTitle={setNewIdeaTitle}
+                  />
 
-              <Input
-                id="ideatitle"
-                placeholder="Your idea title"
-                px="6"
-                py="6"
-                value={title}
-                onChange={({ target: { value } }) => setTitle(value)}
-                textColor="gray.300"
-                borderWidth="2px"
-                bgColor="gray.950"
-                variant="filled"
-                borderColor="gray.950"
-                _hover={{
-                  borderColor: "yellow.500",
-                }}
-                _focus={{
-                  bgColor: "gray.950",
-                  borderColor: "yellow.500",
-                }}
-              />
-            </Box>
+                  <NewIdeaDescriptionForm
+                    errorMessage={newIdeaDescriptionError}
+                    newIdeaDescription={newIdeaDescription}
+                    setNewIdeaDescription={setNewIdeaDescription}
+                  />
+                </Stack>
 
-            <Box>
-              <FormLabel htmlFor="desc" fontSize="lg" color="gray.400">
-                Description
-              </FormLabel>
+                <Flex>
+                  <Button
+                    onClick={sendIdeaDrawerDisclosure.onClose}
+                    variant="outline"
+                    mr="1rem"
+                    colorScheme="red"
+                    borderWidth="2px"
+                    borderColor="red.500"
+                    fontSize="lg"
+                    _hover={{ color: "gray.50", backgroundColor: "red.500" }}
+                  >
+                    Cancel
+                  </Button>
 
-              <Textarea
-                id="desc"
-                value={description}
-                onChange={({ target: { value } }) => setDescription(value)}
-                placeholder="Describe your amazing idea"
-                px="6"
-                py="6"
-                minH="12rem"
-                borderWidth="2px"
-                textColor="gray.300"
-                bgColor="gray.950"
-                variant="filled"
-                borderColor="gray.950"
-                _hover={{
-                  borderColor: "yellow.500",
-                }}
-                _focus={{
-                  bgColor: "gray.950",
-                  borderColor: "yellow.500",
-                }}
-              />
-            </Box>
-          </Stack>
-
-          <Flex>
-            <Button
-              onClick={sendIdeaDrawerDisclosure.onClose}
-              variant="outline"
-              mr="1rem"
-              colorScheme="red"
-              borderWidth="2px"
-              borderColor="red.500"
-              fontSize="lg"
-              _hover={{ color: "gray.50", backgroundColor: "red.500" }}
-            >
-              Cancel
-            </Button>
-
-            <Button onClick={handleSendIdea} fontSize="lg" colorScheme="yellow">
-              Submit idea
-            </Button>
-          </Flex>
+                  <Button
+                    onClick={handleSendIdea}
+                    isLoading={isSendingIdea}
+                    loadingText="Sending"
+                    fontSize="lg"
+                    colorScheme="yellow"
+                  >
+                    Submit idea
+                  </Button>
+                </Flex>
+              </>
+            ) : (
+              <MintAccessPass />
+            )}
+          </SkeletonText>
         </DrawerBody>
       </DrawerContent>
     </Drawer>
