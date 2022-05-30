@@ -6,6 +6,7 @@ import {
   Input,
   Stack,
   Text,
+  SkeletonText,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useWeb3React } from "@web3-react/core";
@@ -154,33 +155,37 @@ export default function Idea() {
           mb="8"
           mt="4"
         >
-          <Heading mb="6" fontSize="5xl" color="gray.100" fontWeight="600">
-            {idea?.title}
-          </Heading>
+          <SkeletonText isLoaded={idea !== null} mb="5">
+            <Heading mb="6" fontSize="5xl" color="gray.100" fontWeight="600">
+              {idea?.title}
+            </Heading>
+          </SkeletonText>
 
           <Stack w="100%" maxWidth="md" spacing="6" mb="5">
-            <IdeaStatsItem
-              title="created at"
-              value={idea?.createdAt}
-              icon={FiClock}
-              color="gray.400"
-            />
+            <SkeletonText isLoaded={idea !== null}>
+              <IdeaStatsItem
+                title="created at"
+                value={idea?.createdAt}
+                icon={FiClock}
+                color="gray.400"
+              />
 
-            <IdeaStatsItem
-              title="up votes"
-              value={idea?.upvotes}
-              icon={CgArrowUp}
-              color="green.500"
-              onClick={() => handleVote(VoteTypes.UpVote)}
-            />
+              <IdeaStatsItem
+                title="up votes"
+                value={idea?.upvotes}
+                icon={CgArrowUp}
+                color="green.500"
+                onClick={() => handleVote(VoteTypes.UpVote)}
+              />
 
-            <IdeaStatsItem
-              title="down votes"
-              value={idea?.downvotes}
-              icon={CgArrowDown}
-              color="red.500"
-              onClick={() => handleVote(VoteTypes.DownVote)}
-            />
+              <IdeaStatsItem
+                title="down votes"
+                value={idea?.downvotes}
+                icon={CgArrowDown}
+                color="red.500"
+                onClick={() => handleVote(VoteTypes.DownVote)}
+              />
+            </SkeletonText>
           </Stack>
 
           <Divider mb="4" borderColor="gray.600" />
