@@ -27,6 +27,8 @@ export function Idea({
   const { account } = useWeb3React();
   const { data: votes, isLoading: votesIsLoading } = useVotesList(account);
 
+  // console.log(votes);
+
   return (
     <Box
       w="100%"
@@ -54,7 +56,7 @@ export function Idea({
             id={id}
             voteType={2}
             isVoted={
-              votes && votes.find((vote) => vote.id === id)?.voteType === 2
+              votes?.find((vote) => vote.id === id)?.voteType === 2 ?? false
             }
             votesCount={upvotes}
           />
@@ -63,7 +65,7 @@ export function Idea({
             id={id}
             voteType={1}
             isVoted={
-              votes && votes.find((vote) => vote.id === id)?.voteType === 1
+              votes?.find((vote) => vote.id === id)?.voteType === 1 ?? false
             }
             votesCount={downvotes}
           />

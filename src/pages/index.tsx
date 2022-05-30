@@ -70,15 +70,44 @@ export default function Home() {
         voteType,
       };
 
-      console.log(formattedVote);
+      console.log("formattedVote", formattedVote);
 
-      await queryClient.cancelQueries(["votesList", newVoteId]);
+      await queryClient.cancelQueries(["votesList", account]);
 
-      const previousVotes = queryClient.getQueryData(["votesList", newVoteId]);
+      const previousVotes = queryClient.getQueryData(["votesList", account]);
 
-      console.log(previousVotes);
+      console.log("previousVotes", previousVotes);
 
-      queryClient.setQueryData(["votesList", newVoteId], formattedVote);
+      queryClient.setQueryData(["votesList", account], [formattedVote]);
+      queryClient.setQueryData("ideasList", (oldIdeas) => {
+        const oldIdeasArray = oldIdeas as IdeaProps[];
+
+        if (!oldIdeas) {
+          throw new Error("no old ideas");
+        }
+
+        console.log("oldIdeasArray", oldIdeasArray);
+        console.log("formattedVote.id", formattedVote.id);
+
+        const updatedIdeaIndex = oldIdeasArray.findIndex((oldIdea, i) => {
+          if (oldIdea.id === formattedVote.id) {
+            return true;
+          }
+        });
+
+        console.log({ updatedIdeaIndex });
+        console.log({ oldIdeasArray });
+
+        if (formattedVote.voteType === 1) {
+          oldIdeasArray[updatedIdeaIndex].downvotes--;
+        }
+
+        if (formattedVote.voteType === 2) {
+          oldIdeasArray[updatedIdeaIndex].upvotes++;
+        }
+
+        return oldIdeasArray;
+      });
 
       return { previousVotes, formattedVote };
     },
@@ -88,7 +117,7 @@ export default function Home() {
         const newVote = (context as PreviusVotesContext)?.newVote;
 
         if (previousVotes) {
-          queryClient.setQueryData(["votesList", newVote.id], newVote);
+          queryClient.setQueryData(["votesList", account], newVote);
         }
       },
       onSettled: (context) => {
@@ -185,13 +214,16 @@ export default function Home() {
     }
 
     contract.on("IdeaCreated", updateIdeiasList);
-    contract.on("IdeaVotesUpdated", updateVotesList);
+
+    if (account) {
+      contract.on("IdeaVotesUpdated", updateVotesList);
+    }
 
     return () => {
       contract.off("IdeaCreated", updateIdeiasList);
       contract.off("IdeaVotesUpdated", updateVotesList);
     };
-  }, []);
+  }, [account]);
 
   return (
     <Flex
