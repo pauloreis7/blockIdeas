@@ -6,12 +6,13 @@ import {
   Input,
   Stack,
   Text,
+  Skeleton,
   SkeletonText,
   Button,
   useToast,
   Spinner,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -67,6 +68,24 @@ export default function Idea() {
   const [comment, setComment] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
 
+  useEffect(() => {
+    const contract = config.contracts.BoardIdeas();
+
+    async function updateCommentList(ideaId: number, commentIndex: number) {
+      try {
+        queryClient.invalidateQueries("ideaDetails");
+      } catch (error) {
+        console.log({ error });
+      }
+    }
+
+    contract.on("IdeaCommented", updateCommentList);
+
+    return () => {
+      contract.off("IdeaCommented", updateCommentList);
+    };
+  }, []);
+
   const sendComment = useMutation(
     async (comment: string) => {
       setIsCommenting(true);
@@ -87,7 +106,6 @@ export default function Idea() {
 
       return;
     },
-
     {
       onSuccess: async (data) => {
         toast({
@@ -113,8 +131,6 @@ export default function Idea() {
       },
       onSettled: async (_, error) => {
         setIsCommenting(false);
-
-        await queryClient.invalidateQueries("ideaDetails");
       },
     }
   );
@@ -175,20 +191,20 @@ export default function Idea() {
       >
         <BackButton />
 
-        <SkeletonText
+        <Skeleton
           isLoaded={!ideaIsLoading}
           w="100%"
           display="flex"
           h="100%"
+          minHeight="12rem"
           maxWidth="4xl"
           mt="4"
+          mb="2"
           justifyContent="center"
           flexDirection="column"
           borderRadius="xl"
           startColor="gray.700"
           endColor="gray.600"
-          spacing="6"
-          noOfLines={8}
         >
           {error ? (
             <FailState errorMessage="Fail to get idea :/" />
@@ -281,33 +297,53 @@ export default function Idea() {
                 </Flex>
 
                 <Divider mt="4" mb="4" borderColor="gray.600" />
-
-                {(ideaIsLoading || ideaIsFetching) && (
-                  <>
-                    <Flex alignItems="center" mb="4">
-                      <Spinner size="sm" color="gray.500" mr="2" />
-
-                      <Text color="gray.500">Fetching</Text>
-                    </Flex>
-                  </>
-                )}
-
-                <Text mb="12" color="gray.100">
-                  {idea?.description}
-                </Text>
-
-                <Stack w="100%" spacing="6">
-                  {idea?.comments.map((comment, i) => (
-                    <Comment
-                      key={i}
-                      senderWallet={comment.createdBy}
-                      createdAt={comment.createdAt}
-                      text={comment.text}
-                    />
-                  ))}
-                </Stack>
               </>
             )
+          )}
+        </Skeleton>
+
+        <SkeletonText
+          isLoaded={!ideaIsLoading}
+          w="100%"
+          display="flex"
+          h="100%"
+          maxWidth="4xl"
+          mt="4"
+          justifyContent="center"
+          flexDirection="column"
+          borderRadius="xl"
+          startColor="gray.700"
+          endColor="gray.600"
+          spacing="6"
+          noOfLines={8}
+        >
+          {!error && !ideaIsLoading && (
+            <>
+              <Text mb="10" color="gray.100">
+                {idea?.description}
+              </Text>
+
+              {(ideaIsLoading || ideaIsFetching) && (
+                <>
+                  <Flex alignItems="center" mb="4">
+                    <Spinner size="sm" color="gray.500" mr="2" />
+
+                    <Text color="gray.500">Fetching</Text>
+                  </Flex>
+                </>
+              )}
+
+              <Stack w="100%" spacing="6">
+                {idea?.comments.map((comment, i) => (
+                  <Comment
+                    key={i}
+                    senderWallet={comment.createdBy}
+                    createdAt={comment.createdAt}
+                    text={comment.text}
+                  />
+                ))}
+              </Stack>
+            </>
           )}
         </SkeletonText>
       </Flex>

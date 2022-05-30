@@ -59,6 +59,25 @@ const _abi = [
         name: "_ideaId",
         type: "uint64",
       },
+      {
+        indexed: false,
+        internalType: "uint64",
+        name: "_commentIndex",
+        type: "uint64",
+      },
+    ],
+    name: "IdeaCommented",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint64",
+        name: "_ideaId",
+        type: "uint64",
+      },
     ],
     name: "IdeaCreated",
     type: "event",
