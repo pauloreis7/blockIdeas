@@ -29,51 +29,44 @@ import type {
 
 export interface BoardIdeasInterface extends utils.Interface {
   functions: {
-    "ACCESS_PASS()": FunctionFragment;
-    "ACCESS_PASS_PRICE()": FunctionFragment;
-    "URI()": FunctionFragment;
     "burnAccessPass()": FunctionFragment;
     "commentOnIdea(string,uint64)": FunctionFragment;
-    "comments(uint64,uint256)": FunctionFragment;
     "createIdea(string,string)": FunctionFragment;
-    "hasAccessPass(address)": FunctionFragment;
-    "ideas(uint64)": FunctionFragment;
     "mintAccessPass()": FunctionFragment;
-    "totalIdeas()": FunctionFragment;
-    "totalSupply()": FunctionFragment;
     "transferAccessPass(address)": FunctionFragment;
     "voteOnIdea(uint8,uint64)": FunctionFragment;
+    "ACCESS_PASS()": FunctionFragment;
+    "ACCESS_PASS_PRICE()": FunctionFragment;
+    "comments(uint64,uint256)": FunctionFragment;
+    "hasAccessPass(address)": FunctionFragment;
+    "ideaCommentsLength(uint64)": FunctionFragment;
+    "ideas(uint64)": FunctionFragment;
+    "totalIdeas()": FunctionFragment;
+    "totalSupply()": FunctionFragment;
+    "URI()": FunctionFragment;
     "votes(uint64,address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "ACCESS_PASS"
-      | "ACCESS_PASS_PRICE"
-      | "URI"
       | "burnAccessPass"
       | "commentOnIdea"
-      | "comments"
       | "createIdea"
-      | "hasAccessPass"
-      | "ideas"
       | "mintAccessPass"
-      | "totalIdeas"
-      | "totalSupply"
       | "transferAccessPass"
       | "voteOnIdea"
+      | "ACCESS_PASS"
+      | "ACCESS_PASS_PRICE"
+      | "comments"
+      | "hasAccessPass"
+      | "ideaCommentsLength"
+      | "ideas"
+      | "totalIdeas"
+      | "totalSupply"
+      | "URI"
       | "votes"
   ): FunctionFragment;
 
-  encodeFunctionData(
-    functionFragment: "ACCESS_PASS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "ACCESS_PASS_PRICE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "URI", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "burnAccessPass",
     values?: undefined
@@ -83,28 +76,11 @@ export interface BoardIdeasInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "comments",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "createIdea",
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "hasAccessPass",
-    values: [string]
-  ): string;
-  encodeFunctionData(functionFragment: "ideas", values: [BigNumberish]): string;
-  encodeFunctionData(
     functionFragment: "mintAccessPass",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalIdeas",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupply",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -116,19 +92,40 @@ export interface BoardIdeasInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "ACCESS_PASS",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ACCESS_PASS_PRICE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "comments",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hasAccessPass",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ideaCommentsLength",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "ideas", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "totalIdeas",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "URI", values?: undefined): string;
+  encodeFunctionData(
     functionFragment: "votes",
     values: [BigNumberish, string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "ACCESS_PASS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "ACCESS_PASS_PRICE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "URI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "burnAccessPass",
     data: BytesLike
@@ -137,20 +134,9 @@ export interface BoardIdeasInterface extends utils.Interface {
     functionFragment: "commentOnIdea",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "comments", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "createIdea", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "hasAccessPass",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "ideas", data: BytesLike): Result;
-  decodeFunctionResult(
     functionFragment: "mintAccessPass",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "totalIdeas", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -158,11 +144,35 @@ export interface BoardIdeasInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "voteOnIdea", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "ACCESS_PASS",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ACCESS_PASS_PRICE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "comments", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "hasAccessPass",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ideaCommentsLength",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "ideas", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "totalIdeas", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "URI", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "votes", data: BytesLike): Result;
 
   events: {
     "IdeaCreated(uint64)": EventFragment;
-    "IdeaVotesUpdated(uint64,uint8)": EventFragment;
+    "IdeaVotesUpdated(uint64,uint64,int64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "IdeaCreated"): EventFragment;
@@ -178,10 +188,11 @@ export type IdeaCreatedEventFilter = TypedEventFilter<IdeaCreatedEvent>;
 
 export interface IdeaVotesUpdatedEventObject {
   _voteId: BigNumber;
-  _voteType: number;
+  _upvotes: BigNumber;
+  _downvotes: BigNumber;
 }
 export type IdeaVotesUpdatedEvent = TypedEvent<
-  [BigNumber, number],
+  [BigNumber, BigNumber, BigNumber],
   IdeaVotesUpdatedEventObject
 >;
 
@@ -215,12 +226,6 @@ export interface BoardIdeas extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    ACCESS_PASS(overrides?: CallOverrides): Promise<[number]>;
-
-    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<[number]>;
-
-    URI(overrides?: CallOverrides): Promise<[string]>;
-
     burnAccessPass(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -230,6 +235,31 @@ export interface BoardIdeas extends BaseContract {
       _ideaId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    createIdea(
+      _title: string,
+      _description: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    mintAccessPass(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    transferAccessPass(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    voteOnIdea(
+      _voteType: BigNumberish,
+      _ideaId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    ACCESS_PASS(overrides?: CallOverrides): Promise<[number]>;
+
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<[number]>;
 
     comments(
       arg0: BigNumberish,
@@ -243,13 +273,12 @@ export interface BoardIdeas extends BaseContract {
       }
     >;
 
-    createIdea(
-      _title: string,
-      _description: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     hasAccessPass(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
+
+    ideaCommentsLength(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     ideas(
       arg0: BigNumberish,
@@ -266,24 +295,11 @@ export interface BoardIdeas extends BaseContract {
       }
     >;
 
-    mintAccessPass(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     totalIdeas(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[number]>;
 
-    transferAccessPass(
-      _to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    voteOnIdea(
-      _voteType: BigNumberish,
-      _ideaId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    URI(overrides?: CallOverrides): Promise<[string]>;
 
     votes(
       arg0: BigNumberish,
@@ -291,12 +307,6 @@ export interface BoardIdeas extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, number] & { voter: string; voteType: number }>;
   };
-
-  ACCESS_PASS(overrides?: CallOverrides): Promise<number>;
-
-  ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<number>;
-
-  URI(overrides?: CallOverrides): Promise<string>;
 
   burnAccessPass(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -307,6 +317,31 @@ export interface BoardIdeas extends BaseContract {
     _ideaId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  createIdea(
+    _title: string,
+    _description: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  mintAccessPass(
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  transferAccessPass(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  voteOnIdea(
+    _voteType: BigNumberish,
+    _ideaId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  ACCESS_PASS(overrides?: CallOverrides): Promise<number>;
+
+  ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<number>;
 
   comments(
     arg0: BigNumberish,
@@ -320,13 +355,12 @@ export interface BoardIdeas extends BaseContract {
     }
   >;
 
-  createIdea(
-    _title: string,
-    _description: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   hasAccessPass(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+  ideaCommentsLength(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   ideas(
     arg0: BigNumberish,
@@ -343,24 +377,11 @@ export interface BoardIdeas extends BaseContract {
     }
   >;
 
-  mintAccessPass(
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   totalIdeas(overrides?: CallOverrides): Promise<BigNumber>;
 
   totalSupply(overrides?: CallOverrides): Promise<number>;
 
-  transferAccessPass(
-    _to: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  voteOnIdea(
-    _voteType: BigNumberish,
-    _ideaId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  URI(overrides?: CallOverrides): Promise<string>;
 
   votes(
     arg0: BigNumberish,
@@ -369,12 +390,6 @@ export interface BoardIdeas extends BaseContract {
   ): Promise<[string, number] & { voter: string; voteType: number }>;
 
   callStatic: {
-    ACCESS_PASS(overrides?: CallOverrides): Promise<number>;
-
-    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<number>;
-
-    URI(overrides?: CallOverrides): Promise<string>;
-
     burnAccessPass(overrides?: CallOverrides): Promise<void>;
 
     commentOnIdea(
@@ -382,6 +397,26 @@ export interface BoardIdeas extends BaseContract {
       _ideaId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    createIdea(
+      _title: string,
+      _description: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintAccessPass(overrides?: CallOverrides): Promise<void>;
+
+    transferAccessPass(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    voteOnIdea(
+      _voteType: BigNumberish,
+      _ideaId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    ACCESS_PASS(overrides?: CallOverrides): Promise<number>;
+
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<number>;
 
     comments(
       arg0: BigNumberish,
@@ -395,13 +430,12 @@ export interface BoardIdeas extends BaseContract {
       }
     >;
 
-    createIdea(
-      _title: string,
-      _description: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     hasAccessPass(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+    ideaCommentsLength(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     ideas(
       arg0: BigNumberish,
@@ -418,19 +452,11 @@ export interface BoardIdeas extends BaseContract {
       }
     >;
 
-    mintAccessPass(overrides?: CallOverrides): Promise<void>;
-
     totalIdeas(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<number>;
 
-    transferAccessPass(_to: string, overrides?: CallOverrides): Promise<void>;
-
-    voteOnIdea(
-      _voteType: BigNumberish,
-      _ideaId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    URI(overrides?: CallOverrides): Promise<string>;
 
     votes(
       arg0: BigNumberish,
@@ -443,23 +469,19 @@ export interface BoardIdeas extends BaseContract {
     "IdeaCreated(uint64)"(_ideaId?: null): IdeaCreatedEventFilter;
     IdeaCreated(_ideaId?: null): IdeaCreatedEventFilter;
 
-    "IdeaVotesUpdated(uint64,uint8)"(
+    "IdeaVotesUpdated(uint64,uint64,int64)"(
       _voteId?: null,
-      _voteType?: null
+      _upvotes?: null,
+      _downvotes?: null
     ): IdeaVotesUpdatedEventFilter;
     IdeaVotesUpdated(
       _voteId?: null,
-      _voteType?: null
+      _upvotes?: null,
+      _downvotes?: null
     ): IdeaVotesUpdatedEventFilter;
   };
 
   estimateGas: {
-    ACCESS_PASS(overrides?: CallOverrides): Promise<BigNumber>;
-
-    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    URI(overrides?: CallOverrides): Promise<BigNumber>;
-
     burnAccessPass(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -470,29 +492,15 @@ export interface BoardIdeas extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    comments(
-      arg0: BigNumberish,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     createIdea(
       _title: string,
       _description: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    hasAccessPass(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    ideas(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
     mintAccessPass(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    totalIdeas(overrides?: CallOverrides): Promise<BigNumber>;
-
-    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferAccessPass(
       _to: string,
@@ -504,6 +512,31 @@ export interface BoardIdeas extends BaseContract {
       _ideaId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    ACCESS_PASS(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    comments(
+      arg0: BigNumberish,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    hasAccessPass(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    ideaCommentsLength(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    ideas(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalIdeas(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    URI(overrides?: CallOverrides): Promise<BigNumber>;
 
     votes(
       arg0: BigNumberish,
@@ -513,12 +546,6 @@ export interface BoardIdeas extends BaseContract {
   };
 
   populateTransaction: {
-    ACCESS_PASS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    URI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     burnAccessPass(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -529,35 +556,15 @@ export interface BoardIdeas extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    comments(
-      arg0: BigNumberish,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     createIdea(
       _title: string,
       _description: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    hasAccessPass(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    ideas(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     mintAccessPass(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    totalIdeas(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferAccessPass(
       _to: string,
@@ -569,6 +576,37 @@ export interface BoardIdeas extends BaseContract {
       _ideaId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    ACCESS_PASS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    ACCESS_PASS_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    comments(
+      arg0: BigNumberish,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    hasAccessPass(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    ideaCommentsLength(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    ideas(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    totalIdeas(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    URI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     votes(
       arg0: BigNumberish,

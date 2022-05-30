@@ -83,8 +83,6 @@ export default function Idea() {
         await contract.functions.commentOnIdea(comment, String(query.slug))
       ).wait();
 
-      // await queryClient.cancelQueries(["ideasList"]);
-
       return;
     },
 
@@ -111,8 +109,10 @@ export default function Idea() {
           position: "top-right",
         });
       },
-      onSettled: (_, error) => {
+      onSettled: async (_, error) => {
         setIsCommenting(false);
+
+        await queryClient.invalidateQueries("ideaDetails");
       },
     }
   );
@@ -283,10 +283,10 @@ export default function Idea() {
               </Text>
 
               <Stack w="100%" spacing="6">
-                {tempComments.map((comment, i) => (
+                {idea?.comments.map((comment, i) => (
                   <Comment
                     key={i}
-                    senderWallet={comment.senderWallet}
+                    senderWallet={comment.createdBy}
                     createdAt={comment.createdAt}
                     text={comment.text}
                   />
@@ -299,11 +299,3 @@ export default function Idea() {
     </Flex>
   );
 }
-
-const tempComments = [
-  {
-    senderWallet: "0x701d...3d71",
-    createdAt: "17:05 - 28/05/2022",
-    text: "My test comment!",
-  },
-];

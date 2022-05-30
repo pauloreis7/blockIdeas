@@ -12,6 +12,13 @@ export type IdeaProps = {
   upvotes: number;
   downvotes: number;
   isVoted: boolean;
+  comments: CommentProps[];
+};
+
+export type CommentProps = {
+  text: string;
+  createdBy: string;
+  createdAt: string;
 };
 
 type GetIdeaDetailsesponse = IdeaProps;
@@ -40,7 +47,35 @@ export async function getIdeaDetails(
     upvotes: formattedUpvotes,
     downvotes: formattedDownvotes,
     createdAt: formattedCreatedAt,
-  };
+    comments: [],
+  } as IdeaProps;
+
+  const [totalCommentsLength] = await contract.functions.ideaCommentsLength(
+    String(ideaId)
+  );
+
+  const formattedCommentsLength = Number(totalCommentsLength.toString());
+
+  for (let i = 0; i < formattedCommentsLength; i++) {
+    const { createdAt, createdBy, text } = await contract.functions.comments(
+      ideaId,
+      i
+    );
+
+    const formattedCreatedAt = dayjs(
+      Number(createdAt.toString()) * 1000
+    ).format("HH:mm - MMM, DD YYYY");
+
+    const formattedComment = {
+      createdAt: formattedCreatedAt,
+      createdBy: `${createdBy.substring(0, 6)}...${createdBy.substring(
+        createdBy.length - 4
+      )}`,
+      text,
+    };
+
+    formattedIdea.comments.push(formattedComment);
+  }
 
   return formattedIdea;
 }
