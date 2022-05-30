@@ -13,6 +13,7 @@ export function IdeaContent({ id, description, created_at }: IdeaProps) {
 
   return (
     <Box
+      onClick={() => router.push(`ideas/${id}`)}
       px="4"
       py="4"
       cursor="pointer"

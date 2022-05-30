@@ -188,7 +188,7 @@ export default function Idea() {
             </Stack>
           </SkeletonText>
 
-          <Divider mb="4" borderColor="gray.600" />
+          {/* <Divider mb="4" borderColor="gray.600" />
 
           <Flex w="100%" alignItems="center">
             <Icon
@@ -213,7 +213,7 @@ export default function Idea() {
                 borderColor: "yellow.500",
               }}
             />
-          </Flex>
+          </Flex> */}
 
           <Divider mt="4" mb="8" borderColor="gray.600" />
 
@@ -221,7 +221,7 @@ export default function Idea() {
             {idea?.description}
           </Text>
 
-          <Stack w="100%" spacing="6">
+          {/* <Stack w="100%" spacing="6">
             {tempComments.map((comment, i) => (
               <Comment
                 key={i}
@@ -230,7 +230,7 @@ export default function Idea() {
                 text={comment.text}
               />
             ))}
-          </Stack>
+          </Stack> */}
         </Flex>
       </Flex>
     </Flex>
@@ -238,16 +238,6 @@ export default function Idea() {
 }
 
 const tempComments = [
-  {
-    senderWallet: "0x701d...3d71",
-    createdAt: "17:05 - 28/05/2022",
-    text: "My test comment!",
-  },
-  {
-    senderWallet: "0x701d...3d71",
-    createdAt: "17:05 - 28/05/2022",
-    text: "My test comment!",
-  },
   {
     senderWallet: "0x701d...3d71",
     createdAt: "17:05 - 28/05/2022",
