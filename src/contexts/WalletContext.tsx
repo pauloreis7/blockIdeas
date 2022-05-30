@@ -9,6 +9,7 @@ import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { useToast } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 import { ConnectorsName, connectorTypes } from "../config/walletConnetors";
 
@@ -37,6 +38,7 @@ const WalletContext = createContext({} as WalletContextData);
 
 export function WalletProvider({ children }: WalletProviderProps) {
   const { account, activate, deactivate, connector } = useWeb3React();
+  const { query } = useRouter();
 
   const toast = useToast();
 
@@ -56,13 +58,13 @@ export function WalletProvider({ children }: WalletProviderProps) {
 
   useEffect(() => {
     const lastWalletConnector = localStorage.getItem(
-      "@pwarz.last-wallet-connector"
+      "@ideaschain.last-wallet-connector"
     ) as ConnectorsName;
 
     if (lastWalletConnector) {
       activate(connectorTypes[lastWalletConnector]);
     }
-  }, [activate]);
+  }, [activate, query]);
 
   useEffect(() => {
     const walletFormatted = account
@@ -84,7 +86,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
 
       setConnectorName(connectorType as ConnectorsName);
       localStorage.setItem(
-        "@pwarz.last-wallet-connector",
+        "@ideaschain.last-wallet-connector",
         String(connectorType)
       );
     }
@@ -113,7 +115,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
       setWeb3ErrorModalOpen(true);
     }
 
-    localStorage.setItem("@pwarz.last-wallet-connector", "metaMask");
+    localStorage.setItem("@ideaschain.last-wallet-connector", "metaMask");
 
     setWalletModalOpen(false);
   }
@@ -141,13 +143,13 @@ export function WalletProvider({ children }: WalletProviderProps) {
       });
     });
 
-    localStorage.setItem("@pwarz.last-wallet-connector", "walletConnect");
+    localStorage.setItem("@ideaschain.last-wallet-connector", "walletConnect");
 
     setWalletModalOpen(false);
   }
 
   function handleSignOut() {
-    localStorage.removeItem("@pwarz.last-wallet-connector");
+    localStorage.removeItem("@ideaschain.last-wallet-connector");
 
     deactivate();
 

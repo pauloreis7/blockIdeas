@@ -10,6 +10,7 @@ export function BackButton() {
       <Button
         leftIcon={<Icon as={FiArrowLeft} color="gray.300" />}
         maxW="4xl"
+        mr="auto"
         color="gray.200"
         backgroundColor="transparent"
         fontWeight="400"

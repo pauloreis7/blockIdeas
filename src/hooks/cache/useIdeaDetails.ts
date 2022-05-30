@@ -21,12 +21,16 @@ export type CommentProps = {
   createdAt: string;
 };
 
-type GetIdeaDetailsesponse = IdeaProps;
+type GetIdeaDetailsesponse = IdeaProps | undefined;
 
 export async function getIdeaDetails(
-  ideaId: number
+  ideaId: number | undefined
 ): Promise<GetIdeaDetailsesponse> {
   const contract = config.contracts.BoardIdeas();
+
+  if (!ideaId && ideaId !== 0) {
+    return;
+  }
 
   const { createdAt, createdBy, downvotes, upvotes, id, description, title } =
     await contract.functions.ideas(String(ideaId));
@@ -80,7 +84,7 @@ export async function getIdeaDetails(
   return formattedIdea;
 }
 
-export function useIdeaDetails(ideaId: number) {
+export function useIdeaDetails(ideaId: number | undefined) {
   return useQuery(["ideaDetails", ideaId], () => getIdeaDetails(ideaId), {
     staleTime: 1000 * 60 * 3, // 3 minutes
   });

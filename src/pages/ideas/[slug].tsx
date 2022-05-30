@@ -9,6 +9,7 @@ import {
   SkeletonText,
   Button,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useWeb3React } from "@web3-react/core";
@@ -53,13 +54,14 @@ export default function Idea() {
   // hooks
   const { signer } = useSigner();
   const { query } = useRouter();
-  const { account } = useWeb3React();
+  const { account, activate } = useWeb3React();
   const toast = useToast();
 
   const {
     data: idea,
     isLoading: ideaIsLoading,
     error,
+    isFetching: ideaIsFetching,
   } = useIdeaDetails(Number(query.slug));
 
   const [comment, setComment] = useState("");
@@ -162,140 +164,153 @@ export default function Idea() {
 
       <WalletProfileModal />
 
-      <SkeletonText
-        isLoaded={!ideaIsLoading}
+      <Flex
+        as="main"
         w="100%"
-        display="flex"
         h="100%"
-        maxWidth="4xl"
-        justifyContent="center"
         flexDirection="column"
-        borderRadius="xl"
-        startColor="gray.700"
-        endColor="gray.600"
-        spacing="6"
-        noOfLines={8}
+        alignItems="center"
+        px={["6", "8", "12"]}
+        mt="6"
       >
-        {error ? (
-          <FailState errorMessage="Fail to get idea :/" />
-        ) : (
-          !ideaIsLoading && (
-            <Flex
-              as="main"
-              w="100%"
-              h="100%"
-              flexDirection="column"
-              px={["6", "8", "12"]}
-              mt="6"
-            >
-              <Flex
-                as="header"
-                w="100%"
-                flexDirection="column"
-                alignItems="flex-start"
-                mb="8"
-                mt="4"
-              >
-                <BackButton />
+        <BackButton />
 
-                <Heading
-                  my="6"
-                  fontSize="5xl"
-                  color="gray.100"
-                  fontWeight="600"
+        <SkeletonText
+          isLoaded={!ideaIsLoading}
+          w="100%"
+          display="flex"
+          h="100%"
+          maxWidth="4xl"
+          justifyContent="center"
+          flexDirection="column"
+          borderRadius="xl"
+          startColor="gray.700"
+          endColor="gray.600"
+          spacing="6"
+          noOfLines={8}
+        >
+          {error ? (
+            <FailState errorMessage="Fail to get idea :/" />
+          ) : (
+            !ideaIsLoading && (
+              <>
+                <Flex
+                  as="header"
+                  w="100%"
+                  flexDirection="column"
+                  alignItems="flex-start"
+                  mb="8"
+                  mt="4"
                 >
-                  {idea?.title}
-                </Heading>
-              </Flex>
+                  <Heading
+                    mb="6"
+                    fontSize="5xl"
+                    color="gray.100"
+                    fontWeight="600"
+                  >
+                    {idea?.title}
+                  </Heading>
+                </Flex>
 
-              <Stack w="100%" maxWidth="md" spacing="6" mb="5">
-                <IdeaStatsItem
-                  title="created at"
-                  value={idea?.createdAt ?? ""}
-                  icon={FiClock}
-                  color="gray.400"
-                />
-
-                <IdeaStatsItem
-                  title="up votes"
-                  value={idea?.upvotes || 0}
-                  icon={CgArrowUp}
-                  color="green.500"
-                  cursor
-                  onClick={() => handleVote(VoteTypes.UpVote)}
-                />
-
-                <IdeaStatsItem
-                  title="down votes"
-                  value={idea?.downvotes || 0}
-                  icon={CgArrowDown}
-                  color="red.500"
-                  cursor
-                  onClick={() => handleVote(VoteTypes.DownVote)}
-                />
-              </Stack>
-
-              <Divider mb="4" borderColor="gray.600" />
-
-              <Flex w="100%" alignItems="center">
-                <Icon
-                  as={FaRegCommentDots}
-                  mr="2"
-                  fontSize="2xl"
-                  color="gray.400"
-                />
-
-                <Input
-                  placeholder="Add a comment…"
-                  value={comment}
-                  onChange={(event) => setComment(event.target.value)}
-                  px="4"
-                  py="2"
-                  textColor="gray.300"
-                  bgColor="transparent"
-                  variant="unstyled"
-                  _hover={{
-                    backgroundColor: "whiteAlpha.100",
-                  }}
-                  _focus={{
-                    backgroundColor: "whiteAlpha.100",
-                    borderColor: "yellow.500",
-                  }}
-                />
-
-                <Button
-                  onClick={handleComment}
-                  isLoading={isCommenting}
-                  isDisabled={isCommenting}
-                  loadingText="Sending"
-                  ml="4"
-                  fontSize="sm"
-                  colorScheme="yellow"
-                >
-                  Send comment
-                </Button>
-              </Flex>
-
-              <Divider mt="4" mb="8" borderColor="gray.600" />
-
-              <Text mb="12" color="gray.100">
-                {idea?.description}
-              </Text>
-
-              <Stack w="100%" spacing="6">
-                {idea?.comments.map((comment, i) => (
-                  <Comment
-                    key={i}
-                    senderWallet={comment.createdBy}
-                    createdAt={comment.createdAt}
-                    text={comment.text}
+                <Stack w="100%" maxWidth="md" spacing="6" mb="5">
+                  <IdeaStatsItem
+                    title="created at"
+                    value={idea?.createdAt ?? ""}
+                    icon={FiClock}
+                    color="gray.400"
                   />
-                ))}
-              </Stack>
-            </Flex>
-          )
-        )}
-      </SkeletonText>
+
+                  <IdeaStatsItem
+                    title="up votes"
+                    value={idea?.upvotes ?? 0}
+                    icon={CgArrowUp}
+                    color="green.500"
+                    cursor
+                    onClick={() => handleVote(VoteTypes.UpVote)}
+                  />
+
+                  <IdeaStatsItem
+                    title="down votes"
+                    value={idea?.downvotes ?? 0}
+                    icon={CgArrowDown}
+                    color="red.500"
+                    cursor
+                    onClick={() => handleVote(VoteTypes.DownVote)}
+                  />
+                </Stack>
+
+                <Divider mb="4" borderColor="gray.600" />
+
+                <Flex w="100%" alignItems="center">
+                  <Icon
+                    as={FaRegCommentDots}
+                    mr="2"
+                    fontSize="2xl"
+                    color="gray.400"
+                  />
+
+                  <Input
+                    placeholder="Add a comment…"
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                    px="4"
+                    py="2"
+                    textColor="gray.300"
+                    bgColor="transparent"
+                    variant="unstyled"
+                    _hover={{
+                      backgroundColor: "whiteAlpha.100",
+                    }}
+                    _focus={{
+                      backgroundColor: "whiteAlpha.100",
+                      borderColor: "yellow.500",
+                    }}
+                  />
+
+                  <Button
+                    onClick={handleComment}
+                    isLoading={isCommenting}
+                    isDisabled={isCommenting}
+                    loadingText="Sending"
+                    ml="4"
+                    fontSize={["xs", "sm"]}
+                    colorScheme="yellow"
+                  >
+                    Comment
+                  </Button>
+                </Flex>
+
+                <Divider mt="4" mb="4" borderColor="gray.600" />
+
+                {(ideaIsLoading || ideaIsFetching) && (
+                  <>
+                    <Flex alignItems="center" mb="4">
+                      <Spinner size="sm" color="gray.500" mr="2" />
+
+                      <Text color="gray.500">Fetching</Text>
+                    </Flex>
+                  </>
+                )}
+
+                <Text mb="12" color="gray.100">
+                  {idea?.description}
+                </Text>
+
+                <Stack w="100%" spacing="6">
+                  {idea?.comments.map((comment, i) => (
+                    <Comment
+                      key={i}
+                      senderWallet={comment.createdBy}
+                      createdAt={comment.createdAt}
+                      text={comment.text}
+                    />
+                  ))}
+                </Stack>
+              </>
+            )
+          )}
+        </SkeletonText>
+      </Flex>
     </Flex>
   );
 }
