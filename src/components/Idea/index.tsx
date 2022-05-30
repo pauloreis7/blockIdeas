@@ -70,7 +70,7 @@ export function Idea({
         </Flex>
       </Flex>
 
-      <IdeaContent description={description} created_at={created_at} />
+      <IdeaContent id={id} description={description} created_at={created_at} />
     </Box>
   );
 }

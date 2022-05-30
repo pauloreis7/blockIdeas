@@ -18,6 +18,7 @@ export function Header() {
     connectorName,
     setWalletModalOpen,
     setIsWalletProfileModalOpen,
+    showChainError,
   } = useWallet();
 
   return (
@@ -33,7 +34,7 @@ export function Header() {
     >
       <Logo />
 
-      {chainId !== config.supportedChainIds[0] ? (
+      {showChainError && chainId !== config.supportedChainIds[0] ? (
         <UnsupportedNetwork />
       ) : account && connectorName ? (
         <WalletProfile

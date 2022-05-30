@@ -8,6 +8,49 @@ import type { BoardIdeas, BoardIdeasInterface } from "../BoardIdeas";
 
 const _abi = [
   {
+    inputs: [],
+    name: "burnAccessPass",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_text",
+        type: "string",
+      },
+      {
+        internalType: "uint64",
+        name: "_ideaId",
+        type: "uint64",
+      },
+    ],
+    name: "commentOnIdea",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_title",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_description",
+        type: "string",
+      },
+    ],
+    name: "createIdea",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -31,13 +74,57 @@ const _abi = [
       },
       {
         indexed: false,
-        internalType: "enum Test.VoteTypes",
-        name: "_voteType",
-        type: "uint8",
+        internalType: "uint64",
+        name: "_upvotes",
+        type: "uint64",
+      },
+      {
+        indexed: false,
+        internalType: "int64",
+        name: "_downvotes",
+        type: "int64",
       },
     ],
     name: "IdeaVotesUpdated",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "mintAccessPass",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+    ],
+    name: "transferAccessPass",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "enum Test.VoteTypes",
+        name: "_voteType",
+        type: "uint8",
+      },
+      {
+        internalType: "uint64",
+        name: "_ideaId",
+        type: "uint64",
+      },
+    ],
+    name: "voteOnIdea",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [],
@@ -63,44 +150,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "URI",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "burnAccessPass",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_text",
-        type: "string",
-      },
-      {
-        internalType: "uint64",
-        name: "_ideaId",
-        type: "uint64",
-      },
-    ],
-    name: "commentOnIdea",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -140,24 +189,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "string",
-        name: "_title",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_description",
-        type: "string",
-      },
-    ],
-    name: "createIdea",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "address",
         name: "",
         type: "address",
@@ -169,6 +200,25 @@ const _abi = [
         internalType: "bool",
         name: "",
         type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint64",
+        name: "",
+        type: "uint64",
+      },
+    ],
+    name: "ideaCommentsLength",
+    outputs: [
+      {
+        internalType: "uint64",
+        name: "",
+        type: "uint64",
       },
     ],
     stateMutability: "view",
@@ -225,13 +275,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "mintAccessPass",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "totalIdeas",
     outputs: [
       {
@@ -257,34 +300,16 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "URI",
+    outputs: [
       {
-        internalType: "address",
-        name: "_to",
-        type: "address",
+        internalType: "string",
+        name: "",
+        type: "string",
       },
     ],
-    name: "transferAccessPass",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "enum Test.VoteTypes",
-        name: "_voteType",
-        type: "uint8",
-      },
-      {
-        internalType: "uint64",
-        name: "_ideaId",
-        type: "uint64",
-      },
-    ],
-    name: "voteOnIdea",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {

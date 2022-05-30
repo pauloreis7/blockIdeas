@@ -83,6 +83,9 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
         });
       },
       onSettled: () => {
+        queryClient.invalidateQueries("votesList");
+        queryClient.invalidateQueries("ideasList");
+
         setIsVoting(false);
       },
     }

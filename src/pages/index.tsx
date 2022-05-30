@@ -12,6 +12,7 @@ import Head from "next/head";
 import { useWeb3React } from "@web3-react/core";
 import { useMutation } from "react-query";
 import dayjs from "dayjs";
+import { FiExternalLink } from "react-icons/fi";
 
 import { useIdeas } from "../contexts/IdeasContext";
 import { queryClient } from "../services/queryClient";
@@ -54,79 +55,6 @@ export default function Home() {
     isFetching,
     error,
   } = useIdeasList();
-
-  const updateVotesMutation = useMutation(
-    async ({
-      newVoteId,
-      upVotes,
-      downVotes,
-      account,
-    }: UpdateVotesMutationProps) => {
-      const contract = config.contracts.BoardIdeas();
-
-      console.log("innn", { newVoteId, account });
-
-      const { voter, voteType } = await contract.functions.votes(
-        newVoteId,
-        account
-      );
-
-      const formattedVote = {
-        id: Number(newVoteId.toString()),
-        voter,
-        voteType,
-      };
-
-      console.log("formattedVote", formattedVote);
-
-      await queryClient.cancelQueries(["votesList", account]);
-
-      const previousVotes = queryClient.getQueryData(["votesList", account]);
-
-      console.log("previousVotes", previousVotes);
-
-      queryClient.setQueryData(["votesList", account], [formattedVote]);
-      queryClient.setQueryData("ideasList", (oldIdeas) => {
-        const oldIdeasArray = oldIdeas as IdeaProps[];
-
-        if (!oldIdeas) {
-          throw new Error("no old ideas");
-        }
-
-        console.log("oldIdeasArray", oldIdeasArray);
-        console.log("formattedVote.id", formattedVote.id);
-
-        const updatedIdeaIndex = oldIdeasArray.findIndex((oldIdea, i) => {
-          if (oldIdea.id === formattedVote.id) {
-            return true;
-          }
-        });
-
-        console.log({ updatedIdeaIndex });
-        console.log({ oldIdeasArray });
-
-        oldIdeasArray[updatedIdeaIndex].upvotes = upVotes;
-        oldIdeasArray[updatedIdeaIndex].downvotes = downVotes;
-
-        return oldIdeasArray;
-      });
-
-      return { previousVotes, formattedVote };
-    },
-    {
-      onError: (error, _, context) => {
-        const previousVotes = (context as PreviusVotesContext)?.previousVotes;
-        const newVote = (context as PreviusVotesContext)?.newVote;
-
-        if (previousVotes) {
-          queryClient.setQueryData(["votesList", account], newVote);
-        }
-      },
-      onSettled: (context) => {
-        queryClient.invalidateQueries(["votesList", context?.formattedVote.id]);
-      },
-    }
-  );
 
   const updateIdeasMutation = useMutation(
     async (newIdeaId: number) => {
@@ -200,41 +128,12 @@ export default function Home() {
       }
     }
 
-    async function updateVotesList(
-      newVoteId: number,
-      upVotes: number,
-      downVotes: number
-    ) {
-      console.log("ifff");
-      if (!account) {
-        return;
-      }
-
-      try {
-        console.log({ newVoteId, upVotes, downVotes });
-
-        await updateVotesMutation.mutateAsync({
-          newVoteId,
-          upVotes,
-          downVotes,
-          account,
-        });
-      } catch (error) {
-        console.log({ error });
-      }
-    }
-
     contract.on("IdeaCreated", updateIdeiasList);
-
-    if (account) {
-      contract.on("IdeaVotesUpdated", updateVotesList);
-    }
 
     return () => {
       contract.off("IdeaCreated", updateIdeiasList);
-      contract.off("IdeaVotesUpdated", updateVotesList);
     };
-  }, [account]);
+  }, []);
 
   return (
     <Flex
@@ -271,14 +170,15 @@ export default function Home() {
       >
         <Flex
           w="100%"
-          alignItems="center"
+          alignItems={["flex-start", "center"]}
           justifyContent="space-between"
+          flexDirection={["column", "row"]}
           mb="8"
         >
-          <Flex w="100%" alignItems="center" textAlign="left">
+          <Flex w="100%" alignItems="center" textAlign="left" mb={["4", "0"]}>
             <Heading
               mr="5"
-              fontSize="2xl"
+              fontSize={["xl", "xl", "2xl"]}
               color="gray.300"
               fontWeight="400"
               textTransform="capitalize"
@@ -295,12 +195,24 @@ export default function Home() {
             )}
           </Flex>
 
-          <Button
-            onClick={sendIdeaDrawerDisclosure.onOpen}
-            colorScheme="yellow"
-          >
-            Send idea
-          </Button>
+          <Flex gap="4">
+            <Button
+              colorScheme="purple"
+              as="a"
+              href="https://faucet.polygon.technology/"
+              target="_blank"
+              rightIcon={<FiExternalLink />}
+            >
+              Get MATIC
+            </Button>
+
+            <Button
+              onClick={sendIdeaDrawerDisclosure.onOpen}
+              colorScheme="yellow"
+            >
+              Send idea
+            </Button>
+          </Flex>
         </Flex>
 
         <SkeletonText

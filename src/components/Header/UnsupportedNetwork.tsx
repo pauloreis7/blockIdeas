@@ -50,7 +50,12 @@ export function UnsupportedNetwork() {
   }
 
   return (
-    <Alert status="warning" variant="left-accent" w="fit-content" borderRadius='md'>
+    <Alert
+      status="warning"
+      variant="left-accent"
+      w="fit-content"
+      borderRadius="md"
+    >
       <AlertIcon />
       <Flex direction="column" color="gray.800" gap={1}>
         <AlertTitle>Unsupported network</AlertTitle>
