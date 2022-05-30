@@ -32,7 +32,7 @@ type Idea = {
   title: string;
   description: string;
   createdBy: string;
-  createdAt: string | Date;
+  createdAt: string;
   upvotes: number;
   downvotes: number;
   isVoted: boolean;
@@ -165,14 +165,14 @@ export default function Idea() {
             <Stack w="100%" maxWidth="md" spacing="6" mb="5">
               <IdeaStatsItem
                 title="created at"
-                value={idea?.createdAt}
+                value={idea?.createdAt || ""}
                 icon={FiClock}
                 color="gray.400"
               />
 
               <IdeaStatsItem
                 title="up votes"
-                value={idea?.upvotes}
+                value={idea?.upvotes || 0}
                 icon={CgArrowUp}
                 color="green.500"
                 onClick={() => handleVote(VoteTypes.UpVote)}
@@ -180,7 +180,7 @@ export default function Idea() {
 
               <IdeaStatsItem
                 title="down votes"
-                value={idea?.downvotes}
+                value={idea?.downvotes || 0}
                 icon={CgArrowDown}
                 color="red.500"
                 onClick={() => handleVote(VoteTypes.DownVote)}

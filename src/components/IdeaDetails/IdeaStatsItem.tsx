@@ -4,7 +4,7 @@ import { ElementType } from "react";
 type IdeaStatsItemProps = {
   icon: ElementType;
   title: string;
-  value: string;
+  value: number | string;
   color: string;
   onClick?: () => void
 };
