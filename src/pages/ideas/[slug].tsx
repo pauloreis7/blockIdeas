@@ -7,6 +7,7 @@ import {
   Stack,
   Text,
   SkeletonText,
+  Button,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useWeb3React } from "@web3-react/core";
@@ -17,15 +18,19 @@ import { FaRegCommentDots } from "react-icons/fa";
 import { CgArrowUp, CgArrowDown } from "react-icons/cg";
 import dayjs from "dayjs";
 
+import { queryClient } from "../../services/queryClient";
+import { config } from "../../config";
+
+import { useSigner } from "../../hooks/useSigner";
+import { useIdeaDetails } from "../../hooks/cache/useIdeaDetails";
+
 import { Header } from "../../components/Header";
 import { ConnectWalletModal } from "../../components/ConnectWalletModal";
 import { WalletProfileModal } from "../../components/WalletProfileModal";
 import { BackButton } from "../../components/IdeaDetails/BackButton";
 import { IdeaStatsItem } from "../../components/IdeaDetails/IdeaStatsItem";
 import { Comment } from "../../components/IdeaDetails/Comment";
-
-import { useSigner } from "../../hooks/useSigner";
-import { config } from "../../config";
+import { FailState } from "../../components/FailState";
 
 type Idea = {
   id: number;
@@ -44,51 +49,17 @@ enum VoteTypes {
 }
 
 export default function Idea() {
-  // states
-  const [idea, setIdea] = useState<Idea | null>(null);
-
   // hooks
   const { signer } = useSigner();
-  const { account } = useWeb3React();
   const { query } = useRouter();
 
-  async function fetchIdea() {
-    try {
-      const contract = config.contracts.BoardIdeas();
+  const {
+    data: idea,
+    isLoading: ideaIsLoading,
+    error,
+  } = useIdeaDetails(Number(query.slug));
 
-      const {
-        createdAt,
-        createdBy,
-        downvotes,
-        upvotes,
-        id,
-        description,
-        title,
-      } = await contract.functions.ideas(String(query.slug));
-      const formattedId = Number(id.toString());
-      const formattedUpvotes = Number(upvotes.toString());
-      const formattedDownvotes = Number(downvotes.toString());
-
-      const formattedCreatedAt = dayjs(
-        Number(createdAt.toString()) * 1000
-      ).format("HH:mm - MMM, DD YYYY");
-
-      const formattedIdea = {
-        title,
-        createdBy,
-        description,
-        isVoted: false,
-        id: formattedId,
-        upvotes: formattedUpvotes,
-        downvotes: formattedDownvotes,
-        createdAt: formattedCreatedAt,
-      };
-
-      setIdea(formattedIdea);
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  const [comment, setComment] = useState("");
 
   async function handleVote(voteType: VoteTypes) {
     try {
@@ -98,18 +69,11 @@ export default function Idea() {
         await contract.functions.voteOnIdea(voteType, idea?.id as number)
       ).wait();
 
-      await fetchIdea();
+      queryClient.invalidateQueries("ideaDetails");
     } catch (err) {
       console.log({ err });
     }
   }
-
-  // fetch idea
-  useEffect(() => {
-    if (typeof query.slug === "string") {
-      (async () => await fetchIdea())();
-    }
-  }, [query]);
 
   return (
     <Flex
@@ -134,107 +98,137 @@ export default function Idea() {
 
       <WalletProfileModal />
 
-      <Flex
-        as="main"
+      <SkeletonText
+        isLoaded={!ideaIsLoading}
         w="100%"
+        display="flex"
         h="100%"
         maxWidth="4xl"
-        alignItems="center"
         justifyContent="center"
         flexDirection="column"
-        px={["6", "8", "12"]}
-        mt="6"
+        borderRadius="xl"
+        startColor="gray.700"
+        endColor="gray.600"
+        spacing="6"
+        noOfLines={8}
       >
-        <Flex
-          as="header"
-          w="100%"
-          flexDirection="column"
-          justifyContent="center"
-          mb="8"
-          mt="4"
-        >
-          <SkeletonText isLoaded={idea !== null} mb="5">
-            <BackButton />
+        {error ? (
+          <FailState errorMessage="Fail to get idea :/" />
+        ) : (
+          !ideaIsLoading && (
+            <Flex
+              as="main"
+              w="100%"
+              h="100%"
+              flexDirection="column"
+              px={["6", "8", "12"]}
+              mt="6"
+            >
+              <Flex
+                as="header"
+                w="100%"
+                flexDirection="column"
+                alignItems="flex-start"
+                mb="8"
+                mt="4"
+              >
+                <BackButton />
 
-            <Heading my="6" fontSize="5xl" color="gray.100" fontWeight="600">
-              {idea?.title}
-            </Heading>
-          </SkeletonText>
+                <Heading
+                  my="6"
+                  fontSize="5xl"
+                  color="gray.100"
+                  fontWeight="600"
+                >
+                  {idea?.title}
+                </Heading>
+              </Flex>
 
-          <SkeletonText isLoaded={idea !== null}>
-            <Stack w="100%" maxWidth="md" spacing="6" mb="5">
-              <IdeaStatsItem
-                title="created at"
-                value={idea?.createdAt || ""}
-                icon={FiClock}
-                color="gray.400"
-              />
+              <Stack w="100%" maxWidth="md" spacing="6" mb="5">
+                <IdeaStatsItem
+                  title="created at"
+                  value={idea?.createdAt ?? ""}
+                  icon={FiClock}
+                  color="gray.400"
+                />
 
-              <IdeaStatsItem
-                title="up votes"
-                value={idea?.upvotes || 0}
-                icon={CgArrowUp}
-                color="green.500"
-                cursor
-                onClick={() => handleVote(VoteTypes.UpVote)}
-              />
+                <IdeaStatsItem
+                  title="up votes"
+                  value={idea?.upvotes || 0}
+                  icon={CgArrowUp}
+                  color="green.500"
+                  cursor
+                  onClick={() => handleVote(VoteTypes.UpVote)}
+                />
 
-              <IdeaStatsItem
-                title="down votes"
-                value={idea?.downvotes || 0}
-                icon={CgArrowDown}
-                color="red.500"
-                cursor
-                onClick={() => handleVote(VoteTypes.DownVote)}
-              />
-            </Stack>
-          </SkeletonText>
+                <IdeaStatsItem
+                  title="down votes"
+                  value={idea?.downvotes || 0}
+                  icon={CgArrowDown}
+                  color="red.500"
+                  cursor
+                  onClick={() => handleVote(VoteTypes.DownVote)}
+                />
+              </Stack>
 
-          {/* <Divider mb="4" borderColor="gray.600" />
+              <Divider mb="4" borderColor="gray.600" />
 
-          <Flex w="100%" alignItems="center">
-            <Icon
-              as={FaRegCommentDots}
-              mr="2"
-              fontSize="2xl"
-              color="gray.400"
-            />
+              <Flex w="100%" alignItems="center">
+                <Icon
+                  as={FaRegCommentDots}
+                  mr="2"
+                  fontSize="2xl"
+                  color="gray.400"
+                />
 
-            <Input
-              placeholder="Add a comment…"
-              px="4"
-              py="2"
-              textColor="gray.300"
-              bgColor="transparent"
-              variant="unstyled"
-              _hover={{
-                backgroundColor: "whiteAlpha.100",
-              }}
-              _focus={{
-                backgroundColor: "whiteAlpha.100",
-                borderColor: "yellow.500",
-              }}
-            />
-          </Flex> */}
+                <Input
+                  placeholder="Add a comment…"
+                  value={comment}
+                  onChange={(event) => setComment(event.target.value)}
+                  px="4"
+                  py="2"
+                  textColor="gray.300"
+                  bgColor="transparent"
+                  variant="unstyled"
+                  _hover={{
+                    backgroundColor: "whiteAlpha.100",
+                  }}
+                  _focus={{
+                    backgroundColor: "whiteAlpha.100",
+                    borderColor: "yellow.500",
+                  }}
+                />
 
-          <Divider mt="4" mb="8" borderColor="gray.600" />
+                <Button
+                  loadingText="Sending"
+                  ml="4"
+                  fontSize="sm"
+                  colorScheme="yellow"
+                >
+                  Send comment
+                </Button>
+              </Flex>
 
-          <Text mb="12" color="gray.100">
-            {idea?.description}
-          </Text>
+              <Divider mt="4" mb="8" borderColor="gray.600" />
 
-          {/* <Stack w="100%" spacing="6">
-            {tempComments.map((comment, i) => (
-              <Comment
-                key={i}
-                senderWallet={comment.senderWallet}
-                createdAt={comment.createdAt}
-                text={comment.text}
-              />
-            ))}
-          </Stack> */}
-        </Flex>
-      </Flex>
+              <Text mb="12" color="gray.100">
+                {idea?.description}
+              </Text>
+
+              <Stack w="100%" spacing="6">
+                {tempComments.map((comment, i) => (
+                  <Comment
+                    key={i}
+                    senderWallet={comment.senderWallet}
+                    createdAt={comment.createdAt}
+                    text={comment.text}
+                  />
+                ))}
+              </Stack>
+            </Flex>
+          )
+        )}
+      </SkeletonText>
     </Flex>
   );
 }

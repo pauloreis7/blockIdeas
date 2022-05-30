@@ -55,79 +55,6 @@ export default function Home() {
     error,
   } = useIdeasList();
 
-  const updateVotesMutation = useMutation(
-    async ({
-      newVoteId,
-      upVotes,
-      downVotes,
-      account,
-    }: UpdateVotesMutationProps) => {
-      const contract = config.contracts.BoardIdeas();
-
-      console.log("innn", { newVoteId, account });
-
-      const { voter, voteType } = await contract.functions.votes(
-        newVoteId,
-        account
-      );
-
-      const formattedVote = {
-        id: Number(newVoteId.toString()),
-        voter,
-        voteType,
-      };
-
-      console.log("formattedVote", formattedVote);
-
-      await queryClient.cancelQueries(["votesList", account]);
-
-      const previousVotes = queryClient.getQueryData(["votesList", account]);
-
-      console.log("previousVotes", previousVotes);
-
-      queryClient.setQueryData(["votesList", account], [formattedVote]);
-      queryClient.setQueryData("ideasList", (oldIdeas) => {
-        const oldIdeasArray = oldIdeas as IdeaProps[];
-
-        if (!oldIdeas) {
-          throw new Error("no old ideas");
-        }
-
-        console.log("oldIdeasArray", oldIdeasArray);
-        console.log("formattedVote.id", formattedVote.id);
-
-        const updatedIdeaIndex = oldIdeasArray.findIndex((oldIdea, i) => {
-          if (oldIdea.id === formattedVote.id) {
-            return true;
-          }
-        });
-
-        console.log({ updatedIdeaIndex });
-        console.log({ oldIdeasArray });
-
-        oldIdeasArray[updatedIdeaIndex].upvotes = upVotes;
-        oldIdeasArray[updatedIdeaIndex].downvotes = downVotes;
-
-        return oldIdeasArray;
-      });
-
-      return { previousVotes, formattedVote };
-    },
-    {
-      onError: (error, _, context) => {
-        const previousVotes = (context as PreviusVotesContext)?.previousVotes;
-        const newVote = (context as PreviusVotesContext)?.newVote;
-
-        if (previousVotes) {
-          queryClient.setQueryData(["votesList", account], newVote);
-        }
-      },
-      onSettled: (context) => {
-        queryClient.invalidateQueries(["votesList", context?.formattedVote.id]);
-      },
-    }
-  );
-
   const updateIdeasMutation = useMutation(
     async (newIdeaId: number) => {
       const contract = config.contracts.BoardIdeas();
@@ -200,36 +127,10 @@ export default function Home() {
       }
     }
 
-    async function updateVotesList(
-      newVoteId: number,
-      upVotes: number,
-      downVotes: number
-    ) {
-      console.log("ifff");
-      if (!account) {
-        return;
-      }
-
-      try {
-        console.log({ newVoteId, upVotes, downVotes });
-
-        await updateVotesMutation.mutateAsync({
-          newVoteId,
-          upVotes,
-          downVotes,
-          account,
-        });
-      } catch (error) {
-        console.log({ error });
-      }
-    }
-
     contract.on("IdeaCreated", updateIdeiasList);
-    contract.on("IdeaVotesUpdated", updateVotesList);
 
     return () => {
       contract.off("IdeaCreated", updateIdeiasList);
-      contract.off("IdeaVotesUpdated", updateVotesList);
     };
   }, []);
 
