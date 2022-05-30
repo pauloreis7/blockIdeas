@@ -7,10 +7,12 @@ import {
   Button,
   useToast,
 } from "@chakra-ui/react";
+import { useRouter } from 'next/router'
 
 export function UnsupportedNetwork() {
   // hooks
   const toast = useToast();
+  const router = useRouter()
 
   async function switchChain() {
     try {
@@ -18,6 +20,8 @@ export function UnsupportedNetwork() {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: "0x13881" }], // it is the 80001 chain Id but encoded in hexadecimal and prefixed with 0x
       });
+
+      router.reload()
     } catch (err) {
       const error = err as Error & { code: number };
 
@@ -29,10 +33,12 @@ export function UnsupportedNetwork() {
               {
                 chainId: "0x13881",
                 chainName: "Polygon-Testnet",
-                rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
+                rpcUrls: ["https://rpc-mumbai.matic.today"],
               },
             ],
           });
+
+          router.reload()
         } catch (err) {
           const error = err as Error;
 

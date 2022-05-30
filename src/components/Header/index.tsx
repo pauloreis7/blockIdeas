@@ -11,7 +11,7 @@ import { ConnectWallet } from "./ConnectWallet";
 import { config } from "../../config";
 
 export function Header() {
-  const { account, chainId } = useWeb3React();
+  const { account } = useWeb3React();
 
   const {
     walletFormatted,
@@ -34,7 +34,8 @@ export function Header() {
     >
       <Logo />
 
-      {showChainError && chainId !== config.supportedChainIds[0] ? (
+      {showChainError &&
+      (window as any).ethereum.chainId !== config.supportedChainIds[0] ? (
         <UnsupportedNetwork />
       ) : account && connectorName ? (
         <WalletProfile
