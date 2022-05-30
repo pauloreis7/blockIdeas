@@ -8,15 +8,16 @@ import {
   Text,
   SkeletonText,
   Button,
+  useToast,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FiClock } from "react-icons/fi";
 import { FaRegCommentDots } from "react-icons/fa";
 import { CgArrowUp, CgArrowDown } from "react-icons/cg";
-import dayjs from "dayjs";
+import { useMutation } from "react-query";
 
 import { queryClient } from "../../services/queryClient";
 import { config } from "../../config";
@@ -52,6 +53,8 @@ export default function Idea() {
   // hooks
   const { signer } = useSigner();
   const { query } = useRouter();
+  const { account } = useWeb3React();
+  const toast = useToast();
 
   const {
     data: idea,
@@ -60,6 +63,67 @@ export default function Idea() {
   } = useIdeaDetails(Number(query.slug));
 
   const [comment, setComment] = useState("");
+  const [isCommenting, setIsCommenting] = useState(false);
+
+  const sendComment = useMutation(
+    async (comment: string) => {
+      setIsCommenting(true);
+
+      if (!account) {
+        throw new Error("Wallet not connected");
+      }
+
+      if (!comment) {
+        throw new Error("Comment is required");
+      }
+
+      const contract = config.contracts.BoardIdeas(signer);
+
+      await (
+        await contract.functions.commentOnIdea(comment, String(query.slug))
+      ).wait();
+
+      // await queryClient.cancelQueries(["ideasList"]);
+
+      return;
+    },
+
+    {
+      onSuccess: async (data) => {
+        toast({
+          title: "Comment sent.",
+          description: `Comment was sent successfully.`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+
+        setComment("");
+      },
+      onError: async (error: Error) => {
+        toast({
+          title: error.message,
+          description: "Please try again",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
+        });
+      },
+      onSettled: (_, error) => {
+        setIsCommenting(false);
+      },
+    }
+  );
+
+  async function handleComment() {
+    try {
+      await sendComment.mutateAsync(comment);
+    } catch (error) {
+      console.log({ error });
+    }
+  }
 
   async function handleVote(voteType: VoteTypes) {
     try {
@@ -85,7 +149,7 @@ export default function Idea() {
       pb="8"
     >
       <Head>
-        <title>My idea - Idea</title>
+        <title>Idea details - Idea</title>
         <meta
           name="description"
           content="blockchain idea details and comments"
@@ -200,6 +264,9 @@ export default function Idea() {
                 />
 
                 <Button
+                  onClick={handleComment}
+                  isLoading={isCommenting}
+                  isDisabled={isCommenting}
                   loadingText="Sending"
                   ml="4"
                   fontSize="sm"
