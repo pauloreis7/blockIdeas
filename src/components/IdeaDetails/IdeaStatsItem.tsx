@@ -6,7 +6,8 @@ type IdeaStatsItemProps = {
   title: string;
   value: number | string;
   color: string;
-  onClick?: () => void
+  onClick?: () => void;
+  cursor?: boolean;
 };
 
 export function IdeaStatsItem({
@@ -14,12 +15,25 @@ export function IdeaStatsItem({
   title,
   value,
   color,
-  onClick
+  onClick,
+  cursor,
 }: IdeaStatsItemProps) {
   return (
-    <Flex w="100%" alignItems="center" justifyContent="space-between">
+    <Flex
+      w="100%"
+      alignItems="center"
+      justifyContent="space-between"
+      wrap="wrap"
+    >
       <Flex alignItems="center">
-        <Icon as={icon} mr="2" fontSize="2xl" color={color} onClick={onClick} />
+        <Icon
+          as={icon}
+          mr="2"
+          cursor={(cursor && "pointer") || "auto"}
+          fontSize="2xl"
+          color={color}
+          onClick={onClick}
+        />
 
         <Text fontSize="lg" color="gray.400" textTransform="capitalize">
           {title}

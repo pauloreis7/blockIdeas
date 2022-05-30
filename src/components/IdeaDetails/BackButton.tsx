@@ -9,11 +9,7 @@ export function BackButton() {
     <Link href={BACK_LINK_HREF} passHref>
       <Button
         leftIcon={<Icon as={FiArrowLeft} color="gray.300" />}
-        px="4"
-        py="2"
-        mt="6"
-        ml="12"
-        mr="auto"
+        maxW="4xl"
         color="gray.200"
         backgroundColor="transparent"
         fontWeight="400"

@@ -225,16 +225,13 @@ export default function Home() {
     }
 
     contract.on("IdeaCreated", updateIdeiasList);
-
-    if (account) {
-      contract.on("IdeaVotesUpdated", updateVotesList);
-    }
+    contract.on("IdeaVotesUpdated", updateVotesList);
 
     return () => {
       contract.off("IdeaCreated", updateIdeiasList);
       contract.off("IdeaVotesUpdated", updateVotesList);
     };
-  }, [account]);
+  }, []);
 
   return (
     <Flex

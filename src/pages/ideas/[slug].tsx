@@ -134,8 +134,6 @@ export default function Idea() {
 
       <WalletProfileModal />
 
-      <BackButton />
-
       <Flex
         as="main"
         w="100%"
@@ -156,9 +154,13 @@ export default function Idea() {
           mt="4"
         >
           <SkeletonText isLoaded={idea !== null} mb="5">
-            <Heading mb="6" fontSize="5xl" color="gray.100" fontWeight="600">
-              {idea?.title}
-            </Heading>
+            <Flex justify="space-between" align="center" gap='2'>
+              <Heading mb="6" fontSize="5xl" color="gray.100" fontWeight="600">
+                {idea?.title}
+              </Heading>
+
+              <BackButton />
+            </Flex>
           </SkeletonText>
 
           <SkeletonText isLoaded={idea !== null}>
@@ -175,6 +177,7 @@ export default function Idea() {
                 value={idea?.upvotes || 0}
                 icon={CgArrowUp}
                 color="green.500"
+                cursor
                 onClick={() => handleVote(VoteTypes.UpVote)}
               />
 
@@ -183,6 +186,7 @@ export default function Idea() {
                 value={idea?.downvotes || 0}
                 icon={CgArrowDown}
                 color="red.500"
+                cursor
                 onClick={() => handleVote(VoteTypes.DownVote)}
               />
             </Stack>
