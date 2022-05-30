@@ -181,6 +181,7 @@ export default function Idea() {
           display="flex"
           h="100%"
           maxWidth="4xl"
+          mt="4"
           justifyContent="center"
           flexDirection="column"
           borderRadius="xl"
@@ -200,7 +201,6 @@ export default function Idea() {
                   flexDirection="column"
                   alignItems="flex-start"
                   mb="8"
-                  mt="4"
                 >
                   <Heading
                     mb="6"

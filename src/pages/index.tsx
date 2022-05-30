@@ -12,7 +12,7 @@ import Head from "next/head";
 import { useWeb3React } from "@web3-react/core";
 import { useMutation } from "react-query";
 import dayjs from "dayjs";
-import { FiExternalLink } from 'react-icons/fi'
+import { FiExternalLink } from "react-icons/fi";
 
 import { useIdeas } from "../contexts/IdeasContext";
 import { queryClient } from "../services/queryClient";
@@ -170,14 +170,15 @@ export default function Home() {
       >
         <Flex
           w="100%"
-          alignItems="center"
+          alignItems={["flex-start", "center"]}
           justifyContent="space-between"
+          flexDirection={["column", "row"]}
           mb="8"
         >
-          <Flex w="100%" alignItems="center" textAlign="left">
+          <Flex w="100%" alignItems="center" textAlign="left" mb={["4", "0"]}>
             <Heading
               mr="5"
-              fontSize="2xl"
+              fontSize={["xl", "xl", "2xl"]}
               color="gray.300"
               fontWeight="400"
               textTransform="capitalize"
@@ -202,7 +203,7 @@ export default function Home() {
               target="_blank"
               rightIcon={<FiExternalLink />}
             >
-              Get some MATIC
+              Get MATIC
             </Button>
 
             <Button
