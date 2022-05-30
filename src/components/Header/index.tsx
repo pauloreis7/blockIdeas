@@ -18,6 +18,7 @@ export function Header() {
     connectorName,
     setWalletModalOpen,
     setIsWalletProfileModalOpen,
+    showChainError,
   } = useWallet();
 
   return (
@@ -33,17 +34,7 @@ export function Header() {
     >
       <Logo />
 
-      {/* {account && connectorName ? (
-        <WalletProfile
-          walletFormatted={walletFormatted}
-          connectorName={connectorName}
-          handleOpenWalletProfileModal={setIsWalletProfileModalOpen}
-        />
-      ) : (
-        <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
-      )} */}
-
-      {chainId && chainId !== config.supportedChainIds[0] ? (
+      {showChainError && chainId !== config.supportedChainIds[0] ? (
         <UnsupportedNetwork />
       ) : account && connectorName ? (
         <WalletProfile
