@@ -1,29 +1,32 @@
+import { useWeb3React } from "@web3-react/core";
 import { Box, Text, Flex } from "@chakra-ui/react";
 
 import { IdeaContent } from "./IdeaContent";
 import { VoteItem } from "./VoteItem";
 
+import { useVotesList } from "../../hooks/cache/useVotesList";
+
 type IdeaProps = {
+  id: number;
   title: string;
   description: string;
-  created_at: string;
-  upvotes: {
-    votesCount: number;
-    isVoted: boolean;
-  };
-  downvotes: {
-    votesCount: number;
-    isVoted: boolean;
-  };
+  created_at: string | Date;
+  upvotes: number;
+  downvotes: number;
 };
 
 export function Idea({
+  id,
   title,
   description,
   created_at,
   upvotes,
   downvotes,
 }: IdeaProps) {
+  // hooks
+  const { account } = useWeb3React();
+  const { data: votes, isLoading: votesIsLoading } = useVotesList(account);
+
   return (
     <Box
       w="100%"
@@ -42,21 +45,27 @@ export function Idea({
         py="3"
         backgroundColor="blackAlpha.300"
       >
-        <Text color="gray.400" fontWeight="600">
+        <Text color="gray.400" fontWeight="600" textTransform="uppercase">
           {title}
         </Text>
 
         <Flex alignItems="center">
           <VoteItem
-            voteType="upvote"
-            isVoted={upvotes.isVoted}
-            votesCount={upvotes.votesCount}
+            id={id}
+            voteType={2}
+            isVoted={
+              votes?.find((vote) => vote.id === id)?.voteType === 2 ?? false
+            }
+            votesCount={upvotes}
           />
 
           <VoteItem
-            voteType="downvote"
-            isVoted={downvotes.isVoted}
-            votesCount={downvotes.votesCount}
+            id={id}
+            voteType={1}
+            isVoted={
+              votes?.find((vote) => vote.id === id)?.voteType === 1 ?? false
+            }
+            votesCount={downvotes}
           />
         </Flex>
       </Flex>
