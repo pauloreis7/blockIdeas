@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import Head from "next/head";
+import { useWeb3React } from "@web3-react/core";
 import { useMutation } from "react-query";
 import dayjs from "dayjs";
 import { FiExternalLink } from "react-icons/fi";
@@ -18,6 +19,7 @@ import { queryClient } from "../services/queryClient";
 import { config } from "../config";
 
 import { useIdeasList, IdeaProps } from "../hooks/cache/useIdeasList";
+import { useVotesList, VoteProps } from "../hooks/cache/useVotesList";
 
 import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
@@ -30,8 +32,19 @@ type PreviusIdeasContext = {
   previousIdeas: IdeaProps[];
 };
 
+type PreviusVotesContext = {
+  formattedNewVote: VoteProps;
+  previousIdeas: IdeaProps[];
+};
+
+type UpdateVotesMutationProps = {
+  voteId: number;
+  upvotes: number;
+  downvotes: number;
+};
+
 export default function Home() {
-  // hooks
+  const { account } = useWeb3React();
   const { sendIdeaDrawerDisclosure } = useIdeas();
   const {
     data: ideas,
@@ -39,6 +52,8 @@ export default function Home() {
     isFetching,
     error,
   } = useIdeasList();
+
+  const { data: votes } = useVotesList(account);
 
   const updateIdeasMutation = useMutation(
     async (newIdeaId: number) => {
@@ -101,6 +116,80 @@ export default function Home() {
     }
   );
 
+  const updateVotesMutation = useMutation(
+    async (vote: UpdateVotesMutationProps) => {
+      const contract = config.contracts.BoardIdeas();
+
+      const formattedVoteId = Number(vote.voteId.toString());
+      const formattedUpdatedUpvotes = Number(vote.upvotes.toString());
+      const formattedUpdatedDownvotes = Number(vote.downvotes.toString());
+
+      const votedItem = votes?.findIndex(
+        (oldVote) => oldVote.id === formattedVoteId
+      );
+
+      const previousIdeas = queryClient.getQueryData(
+        "ideasList"
+      ) as IdeaProps[];
+      const previousVotes = queryClient.getQueryData(["votesList", account]) as
+        | VoteProps[]
+        | undefined;
+
+      if ((!votedItem && votedItem !== 0) || !account || !previousVotes) {
+        return;
+      }
+
+      const updatedIdeaIndex = previousIdeas.findIndex(
+        (oldIdea) => oldIdea.id === formattedVoteId
+      );
+
+      const [voter, voteType] = await contract.functions.votes(
+        formattedVoteId,
+        account
+      );
+
+      const formattedNewVote = {
+        id: formattedVoteId,
+        voter,
+        voteType,
+      };
+
+      await queryClient.cancelQueries(["votesList", account]);
+
+      const formattedVotesList = previousVotes;
+      const formattedIdeasList = previousIdeas;
+
+      formattedVotesList[votedItem] = formattedNewVote;
+
+      formattedIdeasList[updatedIdeaIndex].downvotes =
+        formattedUpdatedDownvotes;
+      formattedIdeasList[updatedIdeaIndex].upvotes = formattedUpdatedUpvotes;
+
+      queryClient.setQueryData("votesList", (oldVotes) => formattedVotesList);
+      queryClient.setQueryData("ideasList", (oldIdeas) => formattedIdeasList);
+
+      return { previousVotes, previousIdeas, formattedNewVote };
+    },
+    {
+      onError: (error, _, context) => {
+        queryClient.setQueryData(
+          ["votesList", account],
+          (context as PreviusVotesContext).formattedNewVote
+        );
+
+        const previousIdeas = (context as PreviusIdeasContext)?.previousIdeas;
+
+        if (previousIdeas) {
+          queryClient.setQueryData("ideasList", previousIdeas);
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries(["votesList", account]);
+        queryClient.invalidateQueries("ideasList");
+      },
+    }
+  );
+
   useEffect(() => {
     const contract = config.contracts.BoardIdeas();
 
@@ -112,10 +201,24 @@ export default function Home() {
       }
     }
 
+    async function updateVotesList(
+      voteId: number,
+      upvotes: number,
+      downvotes: number
+    ) {
+      try {
+        await updateVotesMutation.mutateAsync({ voteId, upvotes, downvotes });
+      } catch (error) {
+        console.log({ error });
+      }
+    }
+
     contract.on("IdeaCreated", updateIdeiasList);
+    contract.on("IdeaVotesUpdated", updateVotesList);
 
     return () => {
       contract.off("IdeaCreated", updateIdeiasList);
+      contract.off("IdeaVotesUpdated", updateVotesList);
     };
   }, []);
 

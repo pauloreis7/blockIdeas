@@ -12,9 +12,6 @@ import { config } from "../../config";
 import { useSigner } from "../../hooks/useSigner";
 import { useGetNFT } from "../../hooks/cache/useGetNFT";
 
-// services
-import { queryClient } from "../../services/queryClient";
-
 import { useWallet } from "../../contexts/WalletContext";
 import { useIdeas, VotesTypes } from "../../contexts/IdeasContext";
 
@@ -83,9 +80,6 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
         });
       },
       onSettled: () => {
-        queryClient.invalidateQueries("votesList");
-        queryClient.invalidateQueries("ideasList");
-
         setIsVoting(false);
       },
     }
@@ -123,21 +117,21 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
   return (
     <>
       {isVoted ? (
-        <Tooltip label="Remove vote" color="gray.400" fontWeight="600">
-          <Button
-            bgColor="transparent"
-            w="50px"
-            _hover={{}}
-            _active={{}}
-            _focus={{}}
-            onClick={handleVote}
-            disabled={isVoting}
-          >
+        <Button
+          bgColor="transparent"
+          w="50px"
+          _hover={{}}
+          _active={{}}
+          _focus={{}}
+          onClick={handleVote}
+          disabled={isVoting}
+          isLoading={isVoting}
+        >
+          <Tooltip label="Remove vote" color="gray.400" fontWeight="600">
             <Text
               display="flex"
               alignItems="center"
               color="gray.400"
-              cursor="pointer"
               _hover={{
                 filter: "brightness(0.8)",
               }}
@@ -151,24 +145,23 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
 
               {votesCount}
             </Text>
-          </Button>
-        </Tooltip>
+          </Tooltip>
+        </Button>
       ) : (
-        <Tooltip label="Add Vote" color="gray.400" fontWeight="600">
-          <Button
-            bgColor="transparent"
-            w="50px"
-            _hover={{}}
-            _active={{}}
-            _focus={{}}
-            onClick={handleVote}
-            disabled={isVoting}
-          >
+        <Button
+          bgColor="transparent"
+          w="50px"
+          _hover={{}}
+          _active={{}}
+          _focus={{}}
+          onClick={handleVote}
+          disabled={isVoting}
+        >
+          <Tooltip label="Add Vote" color="gray.400" fontWeight="600">
             <Text
               display="flex"
               alignItems="center"
               color="gray.400"
-              cursor="pointer"
               _hover={{
                 svg: { color: voteTypesProps[voteType].color },
               }}
@@ -182,8 +175,8 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
 
               {votesCount}
             </Text>
-          </Button>
-        </Tooltip>
+          </Tooltip>
+        </Button>
       )}
     </>
   );
