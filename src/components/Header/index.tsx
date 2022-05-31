@@ -13,10 +13,10 @@ import { config } from "../../config";
 
 export function Header() {
   // states
-  const [injectedChainId, setInjectedChainId] = useState("");
+  const [injectedChainId, setInjectedChainId] = useState<number | null>(null);
 
   // hooks
-  const { account, chainId } = useWeb3React();
+  const { chainId } = useWeb3React();
   const {
     walletFormatted,
     connectorName,
@@ -28,12 +28,12 @@ export function Header() {
     const listener = () => {
       const { ethereum } = window as any;
 
-      setInjectedChainId(ethereum.chainId);
+      setInjectedChainId(parseInt(ethereum.chainId, 16));
 
       if (!chainId && ethereum && ethereum.on) {
         const handleChainChanged = (chainId: string) => {
           console.log("Handling 'chainChanged' event with payload", chainId);
-          setInjectedChainId(chainId);
+          setInjectedChainId(parseInt(chainId, 16));
         };
         ethereum.on("chainChanged", handleChainChanged);
 
@@ -52,6 +52,74 @@ export function Header() {
     };
   }, [chainId]);
 
+  if (injectedChainId === config.supportedChainIds[0] && !chainId) {
+    return (
+      <Flex
+        as="header"
+        w="100%"
+        alignItems="center"
+        justifyContent="space-between"
+        wrap="wrap"
+        gap={4}
+        px="6"
+        py="6"
+      >
+        <Logo />
+
+        <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
+      </Flex>
+    );
+  }
+
+  if (
+    (chainId && chainId !== config.supportedChainIds[0]) ||
+    injectedChainId !== config.supportedChainIds[0]
+  ) {
+    return (
+      <Flex
+        as="header"
+        w="100%"
+        alignItems="center"
+        justifyContent="space-between"
+        wrap="wrap"
+        gap={4}
+        px="6"
+        py="6"
+      >
+        <Logo />
+
+        <UnsupportedNetwork />
+      </Flex>
+    );
+  }
+
+  if (
+    (chainId === config.supportedChainIds[0] ||
+      injectedChainId === config.supportedChainIds[0]) &&
+    connectorName
+  ) {
+    return (
+      <Flex
+        as="header"
+        w="100%"
+        alignItems="center"
+        justifyContent="space-between"
+        wrap="wrap"
+        gap={4}
+        px="6"
+        py="6"
+      >
+        <Logo />
+
+        <WalletProfile
+          walletFormatted={walletFormatted}
+          connectorName={connectorName}
+          handleOpenWalletProfileModal={setIsWalletProfileModalOpen}
+        />
+      </Flex>
+    );
+  }
+
   return (
     <Flex
       as="header"
@@ -65,23 +133,7 @@ export function Header() {
     >
       <Logo />
 
-      {!chainId &&
-      injectedChainId ===
-        `0x${Number(config.supportedChainIds[0]).toString(16)}` ? (
-        <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
-      ) : !chainId ||
-        injectedChainId !==
-          `0x${Number(config.supportedChainIds[0]).toString(16)}` ? (
-        <UnsupportedNetwork />
-      ) : account && connectorName ? (
-        <WalletProfile
-          walletFormatted={walletFormatted}
-          connectorName={connectorName}
-          handleOpenWalletProfileModal={setIsWalletProfileModalOpen}
-        />
-      ) : (
-        <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
-      )}
+      <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
     </Flex>
   );
 }
