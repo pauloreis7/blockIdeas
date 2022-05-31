@@ -254,6 +254,7 @@ export default function Idea() {
                     icon={CgArrowUp}
                     color="green.500"
                     cursor
+                    hover
                     onClick={() => handleVote(VoteTypes.UpVote)}
                   />
 
@@ -263,6 +264,7 @@ export default function Idea() {
                     icon={CgArrowDown}
                     color="red.500"
                     cursor
+                    hover
                     onClick={() => handleVote(VoteTypes.DownVote)}
                   />
                 </Stack>

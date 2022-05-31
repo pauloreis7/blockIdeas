@@ -225,7 +225,6 @@ export default function Home() {
     <Flex
       w="100%"
       h="100%"
-      minHeight="100vh"
       direction="column"
       alignItems="center"
       pb="8"
