@@ -81,6 +81,8 @@ export async function getIdeaDetails(
     formattedIdea.comments.push(formattedComment);
   }
 
+  formattedIdea.comments = formattedIdea.comments.reverse();
+
   return formattedIdea;
 }
 

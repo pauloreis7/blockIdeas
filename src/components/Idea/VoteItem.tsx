@@ -3,6 +3,7 @@ import { useMutation } from "react-query";
 import { useWeb3React } from "@web3-react/core";
 import { CgArrowUp, CgArrowDown } from "react-icons/cg";
 import { Text, Icon, Tooltip, Button, useToast } from "@chakra-ui/react";
+import { Variants } from "framer-motion";
 import type { IconType } from "react-icons";
 
 // web3
@@ -12,8 +13,7 @@ import { config } from "../../config";
 import { useSigner } from "../../hooks/useSigner";
 import { useGetNFT } from "../../hooks/cache/useGetNFT";
 
-// services
-import { queryClient } from "../../services/queryClient";
+import { MotionFlex, loopingVote } from "../../animations";
 
 import { useWallet } from "../../contexts/WalletContext";
 import { useIdeas, VotesTypes } from "../../contexts/IdeasContext";
@@ -83,9 +83,6 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
         });
       },
       onSettled: () => {
-        queryClient.invalidateQueries("votesList");
-        queryClient.invalidateQueries("ideasList");
-
         setIsVoting(false);
       },
     }
@@ -123,67 +120,77 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
   return (
     <>
       {isVoted ? (
-        <Tooltip label="Remove vote" color="gray.400" fontWeight="600">
-          <Button
-            bgColor="transparent"
-            w="50px"
-            _hover={{}}
-            _active={{}}
-            _focus={{}}
-            onClick={handleVote}
-            disabled={isVoting}
-          >
+        <Button
+          bgColor="transparent"
+          w="50px"
+          _hover={{}}
+          _active={{}}
+          _focus={{}}
+          onClick={handleVote}
+          disabled={isVoting}
+        >
+          <Tooltip label="Remove vote" color="gray.400" fontWeight="600">
             <Text
               display="flex"
               alignItems="center"
               color="gray.400"
-              cursor="pointer"
               _hover={{
                 filter: "brightness(0.8)",
               }}
             >
-              <Icon
-                as={voteTypesProps[voteType].icon}
-                ml="1"
-                fontSize="1.5rem"
-                color={voteTypesProps[voteType].color}
-              />
+              <MotionFlex
+                animate="animate"
+                initial="initial"
+                variants={isVoting ? (loopingVote as Variants) : {}}
+              >
+                <Icon
+                  as={voteTypesProps[voteType].icon}
+                  ml="1"
+                  fontSize="1.5rem"
+                  color={voteTypesProps[voteType].color}
+                />
+              </MotionFlex>
 
               {votesCount}
             </Text>
-          </Button>
-        </Tooltip>
+          </Tooltip>
+        </Button>
       ) : (
-        <Tooltip label="Add Vote" color="gray.400" fontWeight="600">
-          <Button
-            bgColor="transparent"
-            w="50px"
-            _hover={{}}
-            _active={{}}
-            _focus={{}}
-            onClick={handleVote}
-            disabled={isVoting}
-          >
+        <Button
+          bgColor="transparent"
+          w="50px"
+          _hover={{}}
+          _active={{}}
+          _focus={{}}
+          onClick={handleVote}
+          disabled={isVoting}
+        >
+          <Tooltip label="Add Vote" color="gray.400" fontWeight="600">
             <Text
               display="flex"
               alignItems="center"
               color="gray.400"
-              cursor="pointer"
               _hover={{
                 svg: { color: voteTypesProps[voteType].color },
               }}
             >
-              <Icon
-                as={voteTypesProps[voteType].icon}
-                ml="1"
-                fontSize="1.5rem"
-                color="gray.400"
-              />
+              <MotionFlex
+                animate="animate"
+                initial="initial"
+                variants={isVoting ? (loopingVote as Variants) : {}}
+              >
+                <Icon
+                  as={voteTypesProps[voteType].icon}
+                  ml="1"
+                  fontSize="1.5rem"
+                  color="gray.400"
+                />
+              </MotionFlex>
 
               {votesCount}
             </Text>
-          </Button>
-        </Tooltip>
+          </Tooltip>
+        </Button>
       )}
     </>
   );

@@ -3,6 +3,8 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Web3ReactProvider } from "@web3-react/core";
 import { QueryClientProvider } from "react-query";
 
+import { Header } from '../components/Header'
+
 import { AppProvider } from "../contexts";
 
 import { theme } from "../styles/theme";
@@ -15,6 +17,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <ChakraProvider resetCSS theme={theme}>
           <AppProvider>
+            <Header />
+            
             <Component {...pageProps} />
           </AppProvider>
         </ChakraProvider>

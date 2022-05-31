@@ -92,6 +92,8 @@ export function NewIdeaDrawer() {
       },
       onSettled: (_, error) => {
         setIsSendingIdea(false);
+
+        queryClient.invalidateQueries("votesList");
       },
     }
   );

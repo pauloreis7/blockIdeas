@@ -33,6 +33,11 @@ export function IdeaStatsItem({
           fontSize="2xl"
           color={color}
           onClick={onClick}
+          borderRadius="md"
+          transition="background 200ms ease"
+          _hover={{
+            backgroundColor: "gray.700",
+          }}
         />
 
         <Text fontSize="lg" color="gray.400" textTransform="capitalize">

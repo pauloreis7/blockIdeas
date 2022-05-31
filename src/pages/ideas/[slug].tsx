@@ -24,16 +24,18 @@ import { useMutation } from "react-query";
 import { queryClient } from "../../services/queryClient";
 import { config } from "../../config";
 
+import { useIdeas } from "../../contexts/IdeasContext";
 import { useSigner } from "../../hooks/useSigner";
 import { useIdeaDetails } from "../../hooks/cache/useIdeaDetails";
 
-import { Header } from "../../components/Header";
 import { ConnectWalletModal } from "../../components/ConnectWalletModal";
 import { WalletProfileModal } from "../../components/WalletProfileModal";
+import { NewIdeaDrawer } from "../../components/NewIdeaDrawer";
 import { BackButton } from "../../components/IdeaDetails/BackButton";
 import { IdeaStatsItem } from "../../components/IdeaDetails/IdeaStatsItem";
 import { Comment } from "../../components/IdeaDetails/Comment";
 import { FailState } from "../../components/FailState";
+import { useGetNFT } from "../../hooks/cache/useGetNFT";
 
 type Idea = {
   id: number;
@@ -55,8 +57,10 @@ export default function Idea() {
   // hooks
   const { signer } = useSigner();
   const { query } = useRouter();
-  const { account, activate } = useWeb3React();
+  const { account } = useWeb3React();
   const toast = useToast();
+
+  const { sendIdeaDrawerDisclosure } = useIdeas();
 
   const {
     data: idea,
@@ -64,6 +68,8 @@ export default function Idea() {
     error,
     isFetching: ideaIsFetching,
   } = useIdeaDetails(Number(query.slug));
+
+  const { data: userHasNFT } = useGetNFT(account);
 
   const [comment, setComment] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
@@ -137,6 +143,12 @@ export default function Idea() {
 
   async function handleComment() {
     try {
+      if (!userHasNFT) {
+        sendIdeaDrawerDisclosure.onOpen();
+
+        return;
+      }
+
       await sendComment.mutateAsync(comment);
     } catch (error) {
       console.log({ error });
@@ -174,11 +186,11 @@ export default function Idea() {
         />
       </Head>
 
-      <Header />
-
       <ConnectWalletModal />
 
       <WalletProfileModal />
+
+      <NewIdeaDrawer />
 
       <Flex
         as="main"

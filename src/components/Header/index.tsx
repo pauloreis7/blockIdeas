@@ -21,12 +21,14 @@ export function Header() {
     walletFormatted,
     connectorName,
     setWalletModalOpen,
-    setIsWalletProfileModalOpen
+    setIsWalletProfileModalOpen,
   } = useWallet();
 
   useEffect(() => {
     const listener = () => {
       const { ethereum } = window as any;
+
+      setInjectedChainId(ethereum.chainId);
 
       if (!chainId && ethereum && ethereum.on) {
         const handleChainChanged = (chainId: string) => {
@@ -34,8 +36,6 @@ export function Header() {
           setInjectedChainId(chainId);
         };
         ethereum.on("chainChanged", handleChainChanged);
-
-        setInjectedChainId(ethereum.chainId);
 
         return () => {
           if (ethereum.removeListener) {
