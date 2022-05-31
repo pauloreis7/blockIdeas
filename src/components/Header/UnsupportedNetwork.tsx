@@ -65,6 +65,7 @@ export function UnsupportedNetwork() {
       right="6"
       w="fit-content"
       borderRadius="md"
+      boxShadow="dark-lg"
       zIndex={5}
     >
       <AlertIcon />
