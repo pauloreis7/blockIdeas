@@ -10,6 +10,8 @@ import {
   Stack,
   ModalFooter,
   Heading,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 
 import { useWallet } from "../../contexts/WalletContext";
@@ -62,9 +64,18 @@ export function ConnectWalletModal() {
             justifyContent="center"
             alignItems="center"
           >
-            <Text w="80%" textAlign="center" fontSize="sm" color="orange.400">
-              Please note, you need connect wallet to send and vote in ideias.
-            </Text>
+            <Alert
+              status="info"
+              colorScheme="telegram"
+              borderRadius="md"
+              variant="left-accent"
+            >
+              <AlertIcon />
+              <Text w="80%" textAlign="center" fontSize="sm" color="gray.900">
+                You need to connect your wallet before sending and voting on
+                ideias.
+              </Text>
+            </Alert>
           </ModalFooter>
         </ModalContent>
       </Modal>
