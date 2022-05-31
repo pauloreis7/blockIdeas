@@ -3,6 +3,7 @@ import { useMutation } from "react-query";
 import { useWeb3React } from "@web3-react/core";
 import { CgArrowUp, CgArrowDown } from "react-icons/cg";
 import { Text, Icon, Tooltip, Button, useToast } from "@chakra-ui/react";
+import { Variants } from "framer-motion";
 import type { IconType } from "react-icons";
 
 // web3
@@ -11,6 +12,8 @@ import { config } from "../../config";
 // hooks
 import { useSigner } from "../../hooks/useSigner";
 import { useGetNFT } from "../../hooks/cache/useGetNFT";
+
+import { MotionFlex, loopingVote } from "../../animations";
 
 import { useWallet } from "../../contexts/WalletContext";
 import { useIdeas, VotesTypes } from "../../contexts/IdeasContext";
@@ -125,7 +128,6 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
           _focus={{}}
           onClick={handleVote}
           disabled={isVoting}
-          isLoading={isVoting}
         >
           <Tooltip label="Remove vote" color="gray.400" fontWeight="600">
             <Text
@@ -136,12 +138,18 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
                 filter: "brightness(0.8)",
               }}
             >
-              <Icon
-                as={voteTypesProps[voteType].icon}
-                ml="1"
-                fontSize="1.5rem"
-                color={voteTypesProps[voteType].color}
-              />
+              <MotionFlex
+                animate="animate"
+                initial="initial"
+                variants={isVoting ? (loopingVote as Variants) : {}}
+              >
+                <Icon
+                  as={voteTypesProps[voteType].icon}
+                  ml="1"
+                  fontSize="1.5rem"
+                  color={voteTypesProps[voteType].color}
+                />
+              </MotionFlex>
 
               {votesCount}
             </Text>
@@ -166,12 +174,18 @@ export function VoteItem({ id, voteType, isVoted, votesCount }: VoteItemProps) {
                 svg: { color: voteTypesProps[voteType].color },
               }}
             >
-              <Icon
-                as={voteTypesProps[voteType].icon}
-                ml="1"
-                fontSize="1.5rem"
-                color="gray.400"
-              />
+              <MotionFlex
+                animate="animate"
+                initial="initial"
+                variants={isVoting ? (loopingVote as Variants) : {}}
+              >
+                <Icon
+                  as={voteTypesProps[voteType].icon}
+                  ml="1"
+                  fontSize="1.5rem"
+                  color="gray.400"
+                />
+              </MotionFlex>
 
               {votesCount}
             </Text>
