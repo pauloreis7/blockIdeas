@@ -60,8 +60,12 @@ export function UnsupportedNetwork() {
     <Alert
       status="warning"
       variant="left-accent"
+      position="absolute"
+      top="6"
+      right="6"
       w="fit-content"
       borderRadius="md"
+      zIndex={5}
     >
       <AlertIcon />
 
