@@ -52,6 +52,9 @@ export function Header() {
     };
   }, [chainId]);
 
+  console.log({ injectedChainId });
+  console.log({ chainId });
+
   if (injectedChainId === config.supportedChainIds[0] && !chainId) {
     return (
       <Flex
