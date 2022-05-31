@@ -6,10 +6,15 @@ import {
   AlertDescription,
   Button,
   useToast,
+  useDisclosure,
+  CloseButton,
 } from "@chakra-ui/react";
 
+import { useWallet } from "../../contexts/WalletContext";
+
 export function UnsupportedNetwork() {
-  // hooks
+  const { unsupportedNetworkDisclosure } = useWallet();
+
   const toast = useToast();
 
   async function switchChain() {
@@ -18,6 +23,8 @@ export function UnsupportedNetwork() {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: "0x13881" }], // it is the 80001 chain Id but encoded in hexadecimal and prefixed with 0x
       });
+
+      unsupportedNetworkDisclosure.onClose();
     } catch (err) {
       const error = err as Error & { code: number };
 
@@ -49,7 +56,7 @@ export function UnsupportedNetwork() {
     }
   }
 
-  return (
+  return unsupportedNetworkDisclosure.isOpen ? (
     <Alert
       status="warning"
       variant="left-accent"
@@ -57,6 +64,7 @@ export function UnsupportedNetwork() {
       borderRadius="md"
     >
       <AlertIcon />
+
       <Flex direction="column" color="gray.800" gap={1}>
         <AlertTitle>Unsupported network</AlertTitle>
         <AlertDescription>
@@ -67,6 +75,15 @@ export function UnsupportedNetwork() {
           Switch to Polygon Testnet
         </Button>
       </Flex>
+
+      <CloseButton
+        onClick={unsupportedNetworkDisclosure.onClose}
+        alignSelf="flex-start"
+        position="relative"
+        right={-1}
+        top={-1}
+        color="black"
+      />
     </Alert>
-  );
+  ) : null;
 }

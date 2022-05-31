@@ -8,51 +8,42 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
-import { useToast } from "@chakra-ui/react";
+import { useDisclosure, UseDisclosureReturn, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 import { ConnectorsName, connectorTypes } from "../config/walletConnetors";
 
 type WalletProviderProps = PropsWithChildren<{}>;
 
-type Web3Error = { message: string; code: number } | null;
-
 type WalletContextData = {
   connectorName: ConnectorsName | null;
-  web3Error: Web3Error;
   walletFormatted: string | null;
   isWalletModalOpen: boolean;
   isWalletProfileModalOpen: boolean;
-  isWeb3ErrorModalOpen: boolean;
-  setWeb3Error: (web3Error: Web3Error) => void;
   setWalletModalOpen: (isOpen: boolean) => void;
   setIsWalletProfileModalOpen: (isOpen: boolean) => void;
-  setWeb3ErrorModalOpen: (isOpen: boolean) => void;
   handleMetaMask: () => Promise<void>;
   handleWalletConnect: () => Promise<void>;
   handleSignOut: () => void;
+  unsupportedNetworkDisclosure: UseDisclosureReturn;
 };
 
 const WalletContext = createContext({} as WalletContextData);
 
 export function WalletProvider({ children }: WalletProviderProps) {
-  const { account, activate, deactivate, connector } = useWeb3React();
+  const { account, activate, deactivate, connector, error } = useWeb3React();
   const { query } = useRouter();
 
   const toast = useToast();
+  const unsupportedNetworkDisclosure = useDisclosure();
 
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
   const [isWalletProfileModalOpen, setIsWalletProfileModalOpen] =
     useState(false);
-  const [isWeb3ErrorModalOpen, setWeb3ErrorModalOpen] = useState(false);
   const [connectorName, setConnectorName] = useState<ConnectorsName | null>(
     null
   );
   const [walletFormatted, setWalletFormatted] = useState<string | null>(null);
-  const [web3Error, setWeb3Error] = useState<{
-    message: string;
-    code: number;
-  } | null>(null);
 
   useEffect(() => {
     const lastWalletConnector = localStorage.getItem(
@@ -65,28 +56,30 @@ export function WalletProvider({ children }: WalletProviderProps) {
   }, [activate, query]);
 
   useEffect(() => {
-    const walletFormatted = account
-      ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
-      : null;
+    if (!connector && !account) {
+      return;
+    }
+
+    const walletFormatted = `${account?.substring(0, 6)}...${account?.substring(
+      account?.length - 4
+    )}`;
 
     setWalletFormatted(walletFormatted);
 
-    if (connector) {
-      const connectorTypes = {
-        metaMask: connector instanceof InjectedConnector,
-        walletConnect: connector instanceof WalletConnectConnector,
-      };
+    const connectorTypes = {
+      metaMask: connector instanceof InjectedConnector,
+      walletConnect: connector instanceof WalletConnectConnector,
+    };
 
-      const connectorType = Object.keys(connectorTypes).find(
-        (key) => connectorTypes[key as ConnectorsName] === true
-      );
+    const connectorType = Object.keys(connectorTypes).find(
+      (key) => connectorTypes[key as ConnectorsName] === true
+    );
 
-      setConnectorName(connectorType as ConnectorsName);
-      localStorage.setItem(
-        "@ideaschain.last-wallet-connector",
-        String(connectorType)
-      );
-    }
+    setConnectorName(connectorType as ConnectorsName);
+    localStorage.setItem(
+      "@ideaschain.last-wallet-connector",
+      String(connectorType)
+    );
   }, [connector, account]);
 
   async function handleMetaMask() {
@@ -99,6 +92,12 @@ export function WalletProvider({ children }: WalletProviderProps) {
     } catch (err) {
       const toastErrorMessage = (err as Error).message;
 
+      if (toastErrorMessage.includes("Unsupported chain id")) {
+        unsupportedNetworkDisclosure.onOpen();
+
+        return;
+      }
+
       toast({
         title: toastErrorMessage,
         description: "Please try again",
@@ -107,13 +106,11 @@ export function WalletProvider({ children }: WalletProviderProps) {
         isClosable: true,
         position: "top-right",
       });
+    } finally {
+      localStorage.setItem("@ideaschain.last-wallet-connector", "metaMask");
 
-      setWeb3ErrorModalOpen(true);
+      setWalletModalOpen(false);
     }
-
-    localStorage.setItem("@ideaschain.last-wallet-connector", "metaMask");
-
-    setWalletModalOpen(false);
   }
 
   async function handleWalletConnect() {
@@ -128,6 +125,19 @@ export function WalletProvider({ children }: WalletProviderProps) {
         walletConnect.walletConnectProvider = undefined;
       }
 
+      localStorage.setItem(
+        "@ideaschain.last-wallet-connector",
+        "walletConnect"
+      );
+
+      setWalletModalOpen(false);
+
+      if (err.message.includes("Unsupported chain id")) {
+        unsupportedNetworkDisclosure.onOpen();
+
+        return;
+      }
+
       toast({
         title: err.message,
         description: "Please try again",
@@ -137,10 +147,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
         position: "top-right",
       });
     });
-
-    localStorage.setItem("@ideaschain.last-wallet-connector", "walletConnect");
-
-    setWalletModalOpen(false);
   }
 
   function handleSignOut() {
@@ -155,18 +161,15 @@ export function WalletProvider({ children }: WalletProviderProps) {
     <WalletContext.Provider
       value={{
         connectorName,
-        web3Error,
         walletFormatted,
         isWalletModalOpen,
         isWalletProfileModalOpen,
-        isWeb3ErrorModalOpen,
         setWalletModalOpen,
         setIsWalletProfileModalOpen,
-        setWeb3ErrorModalOpen,
-        setWeb3Error,
         handleMetaMask,
         handleWalletConnect,
         handleSignOut,
+        unsupportedNetworkDisclosure,
       }}
     >
       {children}

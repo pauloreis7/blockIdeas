@@ -1,5 +1,4 @@
 import { Flex } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
 import { useWeb3React } from "@web3-react/core";
 
 import { useWallet } from "../../contexts/WalletContext";
@@ -9,48 +8,14 @@ import { UnsupportedNetwork } from "./UnsupportedNetwork";
 import { WalletProfile } from "./WalletProfile";
 import { ConnectWallet } from "./ConnectWallet";
 
-import { config } from "../../config";
-
 export function Header() {
-  // states
-  const [injectedChainId, setInjectedChainId] = useState("");
-
-  // hooks
-  const { account, chainId } = useWeb3React();
+  const { account } = useWeb3React();
   const {
     walletFormatted,
     connectorName,
     setWalletModalOpen,
     setIsWalletProfileModalOpen,
   } = useWallet();
-
-  useEffect(() => {
-    const listener = () => {
-      const { ethereum } = window as any;
-
-      setInjectedChainId(ethereum.chainId);
-
-      if (!chainId && ethereum && ethereum.on) {
-        const handleChainChanged = (chainId: string) => {
-          console.log("Handling 'chainChanged' event with payload", chainId);
-          setInjectedChainId(chainId);
-        };
-        ethereum.on("chainChanged", handleChainChanged);
-
-        return () => {
-          if (ethereum.removeListener) {
-            ethereum.removeListener("chainChanged", handleChainChanged);
-          }
-        };
-      }
-    };
-
-    window.addEventListener("load", listener);
-
-    return () => {
-      window.removeEventListener("load", listener);
-    };
-  }, [chainId]);
 
   return (
     <Flex
@@ -65,15 +30,7 @@ export function Header() {
     >
       <Logo />
 
-      {!chainId &&
-      injectedChainId ===
-        `0x${Number(config.supportedChainIds[0]).toString(16)}` ? (
-        <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
-      ) : !chainId ||
-        injectedChainId !==
-          `0x${Number(config.supportedChainIds[0]).toString(16)}` ? (
-        <UnsupportedNetwork />
-      ) : account && connectorName ? (
+      {account && connectorName ? (
         <WalletProfile
           walletFormatted={walletFormatted}
           connectorName={connectorName}
@@ -82,6 +39,8 @@ export function Header() {
       ) : (
         <ConnectWallet handleOpenWalletConnectionModal={setWalletModalOpen} />
       )}
+
+      <UnsupportedNetwork />
     </Flex>
   );
 }
