@@ -8,7 +8,6 @@ type IdeaStatsItemProps = {
   color: string;
   onClick?: () => void;
   cursor?: boolean;
-  hover?: boolean;
 };
 
 export function IdeaStatsItem({
@@ -18,7 +17,6 @@ export function IdeaStatsItem({
   color,
   onClick,
   cursor,
-  hover,
 }: IdeaStatsItemProps) {
   return (
     <Flex
@@ -36,9 +34,9 @@ export function IdeaStatsItem({
           color={color}
           onClick={onClick}
           borderRadius="md"
-          transition='background 200ms ease'
+          transition="background 200ms ease"
           _hover={{
-            bgColor: hover ? "gray.700" : "transparent",
+            backgroundColor: "gray.700",
           }}
         />
 
