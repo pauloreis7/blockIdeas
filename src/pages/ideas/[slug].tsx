@@ -28,7 +28,6 @@ import { useIdeas } from "../../contexts/IdeasContext";
 import { useSigner } from "../../hooks/useSigner";
 import { useIdeaDetails } from "../../hooks/cache/useIdeaDetails";
 
-import { Header } from "../../components/Header";
 import { ConnectWalletModal } from "../../components/ConnectWalletModal";
 import { WalletProfileModal } from "../../components/WalletProfileModal";
 import { NewIdeaDrawer } from "../../components/NewIdeaDrawer";
@@ -186,8 +185,6 @@ export default function Idea() {
           content="blockchain idea details and comments"
         />
       </Head>
-
-      <Header />
 
       <ConnectWalletModal />
 

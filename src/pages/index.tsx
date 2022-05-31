@@ -21,7 +21,6 @@ import { config } from "../config";
 import { useIdeasList, IdeaProps } from "../hooks/cache/useIdeasList";
 import { useVotesList, VoteProps } from "../hooks/cache/useVotesList";
 
-import { Header } from "../components/Header";
 import { ConnectWalletModal } from "../components/ConnectWalletModal";
 import { WalletProfileModal } from "../components/WalletProfileModal";
 import { NewIdeaDrawer } from "../components/NewIdeaDrawer";
@@ -235,8 +234,6 @@ export default function Home() {
         <title>Ideas Chain</title>
         <meta name="description" content="Share and vote to blockchain ideas" />
       </Head>
-
-      <Header />
 
       <ConnectWalletModal />
 
